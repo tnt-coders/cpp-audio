@@ -10,7 +10,7 @@ class CppAudio(ConanFile):
     license = "GNU Lesser General Public License v3.0"
     name = "cpp-audio"
     options = {"shared": [True, False]}
-    requires = "cpp-dsp/0.0.0@tnt-coders/testing"
+    requires = "cpp-dsp/0.0.1@tnt-coders/testing"
     settings = "os", "compiler", "build_type", "arch"
     topics = ("audio")
     url = "https://github.com/tnt-coders/cpp-audio"
