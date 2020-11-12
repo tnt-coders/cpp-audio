@@ -1,14 +1,5 @@
-tnt_project_AddLibrary(${PROJECT_NAME}
-  TARGET
-    audio
-  SOURCES
-    file.cpp
-    signal.cpp
-    wav_file.cpp
-)
+tnt_project_AddLibrary(${PROJECT_NAME} TARGET audio INTERFACE)
 
-target_compile_features(audio PUBLIC cxx_std_17)
+target_compile_features(audio INTERFACE cxx_std_17)
 
-target_link_libraries(audio
-    tnt::dsp
-)
+target_link_libraries(audio INTERFACE tnt::dsp)
