@@ -2,7 +2,7 @@ from conans import ConanFile, CMake, tools
 
 class CppAudio(ConanFile):
     author = "TNT Coders <tnt-coders@googlegroups.com>"
-    build_requires = "gtest/1.10.0"
+    build_requires = "catch2/3.0.0@tnt-coders/testing"
     default_options = {"shared": False}
     description = "C++ library for reading and writing audio files"
     exports_sources = "CMakeLists.txt", "docs/*", "include/*", "src/*", "test/*"
@@ -10,7 +10,7 @@ class CppAudio(ConanFile):
     license = "GNU Lesser General Public License v3.0"
     name = "cpp-audio"
     options = {"shared": [True, False]}
-    requires = "cpp-dsp/0.0.2"
+    requires = "cpp-dsp/1.0.0"
     settings = "os", "compiler", "build_type", "arch"
     topics = ("audio")
     url = "https://github.com/tnt-coders/cpp-audio"
