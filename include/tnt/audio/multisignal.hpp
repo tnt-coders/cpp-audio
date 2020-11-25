@@ -5,7 +5,9 @@
 namespace tnt::audio
 {
 
-// Alias to dsp::signal
+/*!
+\brief Represents a multi-channel audio signal to store and process audio data
+*/
 template <typename T>
 using multisignal = dsp::multisignal<T>;
 

@@ -9,10 +9,9 @@ file(
 add_executable(audio_test
     main.cpp
     approx.cpp
+    file.cpp
+    file_base.cpp
     multisignal.cpp
-    read.cpp
-    reader.cpp
-    reader/wav_reader.cpp
     signal.cpp
     #TODO: others
 )

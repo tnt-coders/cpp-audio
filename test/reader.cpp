@@ -1,1 +1,0 @@
-// Nothing to test (abstract classes cannot be instantiated)
