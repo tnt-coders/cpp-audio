@@ -1,7 +1,7 @@
 #pragma once
 
 #include "file_base.hpp"
-#include "impl/wav_file.hpp"
+#include "wave_file.hpp"
 #include <filesystem>
 #include <memory>
 
@@ -14,7 +14,7 @@ std::unique_ptr<file_base<T>> file(const std::filesystem::path& path)
     // Try based on extension
     if (path.extension() == ".wav")
     {
-        return std::make_unique<impl::wav_file<T>>(path);
+        return std::make_unique<wave_file<T>>(path);
     }
 
     //TODO: invalid file

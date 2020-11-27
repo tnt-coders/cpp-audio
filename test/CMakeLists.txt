@@ -6,6 +6,11 @@ file(
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+file(
+    COPY ${CMAKE_CURRENT_SOURCE_DIR}/data/untitled.wav
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+)
+
 add_executable(audio_test
     main.cpp
     approx.cpp

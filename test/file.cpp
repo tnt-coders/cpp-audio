@@ -6,7 +6,9 @@ using namespace tnt;
 
 TEMPLATE_TEST_CASE("file", "[file]", double, float)
 {
-    const auto file = audio::file<TestType>("sinewave_64bit_100Hz_1000Hz-sample-rate_10-size_1-channels.wav");
+    //const auto file = audio::file<TestType>("sinewave_64bit_100Hz_1000Hz-sample-rate_10-size_1-channels.wav");
+    const auto file = audio::file<TestType>("untitled.wav");
+    const auto signal = file->read();
 }
 
 //#include "approx.hpp"
