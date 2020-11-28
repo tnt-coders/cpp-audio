@@ -1,6 +1,6 @@
 #pragma once
 
-#include "file_base.hpp"
+#include "file.hpp"
 #include <cstdint>
 #include <cstring>
 #include <filesystem>
@@ -18,18 +18,18 @@ namespace tnt::audio
 {
 
 template <typename T>
-class wave_file final : public file_base<T>
+class wave_file final : public file<T>
 {
 public:
 
     explicit wave_file(const std::filesystem::path& path)
-        : m_file(path)
-        , m_sample_rate()
-        , m_size()
-        , m_channels()
-        , m_data_type()
-        , m_data_position()
-        , m_initialized()
+        : m_file{ path }
+        , m_sample_rate{}
+        , m_size{}
+        , m_channels{}
+        , m_data_type{}
+        , m_data_position{}
+        , m_initialized{}
     {
         if (!m_file.is_open())
         {
@@ -47,17 +47,16 @@ public:
         return m_initialized;
     }
 
+    virtual double duration() const override
+    {
+        assert(this->initialized());
+        return this->size() / static_cast<double>(this->sample_rate());
+    }
+
     virtual size_t sample_rate() const override
     {
         assert(this->initialized());
         return m_sample_rate;
-    }
-
-    virtual size_t duration() const override
-    {
-        assert(this->initialized());
-        //TODO: implement
-        throw std::runtime_error("Not implemented yet");
     }
 
     virtual size_t size() const override
@@ -89,8 +88,9 @@ public:
                 {
                     case data_type::PCM_U8:
                     {
-                        //TODO: implement (slightly more complicated because it is unsigned)
-                        throw std::runtime_error("Not implemented yet");
+                        uint8_t value{};
+                        m_file.read(reinterpret_cast<char*>(&value), sizeof(value));
+                        sample = (static_cast<T>(value) - std::numeric_limits<uint8_t>::max() / 2) / std::numeric_limits<uint8_t>::max();
                     }
                     case data_type::PCM_16:
                     {

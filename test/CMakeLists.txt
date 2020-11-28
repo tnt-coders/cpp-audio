@@ -1,23 +1,17 @@
 include(Catch)
 
-# TODO: Use "configure_file" or another more robust method to copy files
-file(
-    COPY ${CMAKE_CURRENT_SOURCE_DIR}/data/sinewave_64bit_100Hz_1000Hz-sample-rate_10-size_1-channels.wav
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
-)
-
-file(
-    COPY ${CMAKE_CURRENT_SOURCE_DIR}/data/untitled.wav
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
-)
+# Copy data files to the binary directory
+file(COPY data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(audio_test
     main.cpp
     approx.cpp
+    config.cpp
     file.cpp
-    file_base.cpp
+    io.cpp
     multisignal.cpp
     signal.cpp
+    wave_file.cpp
     #TODO: others
 )
 
