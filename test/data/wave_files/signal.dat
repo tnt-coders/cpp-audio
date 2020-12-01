@@ -1,4 +1,5 @@
 type:sin
-sample_rate:1000
+sample_rate:2000
 frequency:100
-size:10
+channels:2
+size:20
