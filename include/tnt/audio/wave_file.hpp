@@ -1,6 +1,8 @@
 #pragma once
 
 #include "file.hpp"
+#include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <filesystem>
@@ -111,8 +113,25 @@ public:
                     }
                     case data_type::PCM_24:
                     {
-                        //TODO: implement (no built in type so this is a bit more difficult)
-                        throw std::runtime_error("Not implemented yet");
+                        // No built-in type for 24 bit data
+                        constexpr auto int24_max = 0x7FFFFF;
+                        std::byte bytes[3]{};
+
+                        m_file.read(reinterpret_cast<char*>(&bytes), sizeof(bytes));
+                        constexpr auto scale = int24_max + 1;
+
+                        // Convert the bytes into a 32 bit value to make processing easier
+                        int32_t value = static_cast<uint8_t>(bytes[0])
+                                      + static_cast<uint8_t>(bytes[1]) * 0x100
+                                      + static_cast<uint8_t>(bytes[2]) * 0x10000;
+
+                        // If value > INT24_MAX
+                        if (value > int24_max)
+                        {
+                            value -= 0x1000000;
+                        }
+
+                        sample = static_cast<T>(value) / scale;
                         break;
                     }
                     case data_type::PCM_32:

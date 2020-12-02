@@ -119,7 +119,7 @@ TEMPLATE_TEST_CASE("wave_file::read", "[file][wave_file][read]", float, double)
     SECTION("PCM_U8")
     {
         constexpr auto scale = (static_cast<size_t>(std::numeric_limits<uint8_t>::max()) + 1) / 2;
-        constexpr auto epsilon = static_cast<TestType>(1) / scale / 2;
+        constexpr auto epsilon = static_cast<TestType>(1) / scale;
 
         audio::wave_file<TestType> w("data/wave_files/PCM_U8.wav");
         const auto s = w.read();
@@ -132,6 +132,96 @@ TEMPLATE_TEST_CASE("wave_file::read", "[file][wave_file][read]", float, double)
             for (size_t c = 0; c < s.channels(); ++c)
             {
                 CHECK(s[n][c] == approx(signal[n][c]).epsilon(epsilon));
+            }
+        }
+    }
+
+    SECTION("PCM_16")
+    {
+        constexpr auto scale = static_cast<size_t>(std::numeric_limits<int16_t>::max() + 1);
+        constexpr auto epsilon = static_cast<TestType>(1) / scale;
+
+        audio::wave_file<TestType> w("data/wave_files/PCM_16.wav");
+        const auto s = w.read();
+
+        REQUIRE(s.size() == signal.size());
+        REQUIRE(s.channels() == signal.channels());
+
+        for (size_t n = 0; n < s.size(); ++n)
+        {
+            for (size_t c = 0; c < s.channels(); ++c)
+            {
+                CHECK(s[n][c] == approx(signal[n][c]).epsilon(epsilon));
+            }
+        }
+    }
+
+    SECTION("PCM_24")
+    {
+        // No need to use "epsilon" anymore because 24 bit data is more accurate
+
+        audio::wave_file<TestType> w("data/wave_files/PCM_24.wav");
+        const auto s = w.read();
+
+        REQUIRE(s.size() == signal.size());
+        REQUIRE(s.channels() == signal.channels());
+
+        for (size_t n = 0; n < s.size(); ++n)
+        {
+            for (size_t c = 0; c < s.channels(); ++c)
+            {
+                CHECK(s[n][c] == approx(signal[n][c]));
+            }
+        }
+    }
+
+    SECTION("PCM_32")
+    {
+        audio::wave_file<TestType> w("data/wave_files/PCM_32.wav");
+        const auto s = w.read();
+
+        REQUIRE(s.size() == signal.size());
+        REQUIRE(s.channels() == signal.channels());
+
+        for (size_t n = 0; n < s.size(); ++n)
+        {
+            for (size_t c = 0; c < s.channels(); ++c)
+            {
+                CHECK(s[n][c] == approx(signal[n][c]));
+            }
+        }
+    }
+
+    SECTION("FLOAT")
+    {
+        audio::wave_file<TestType> w("data/wave_files/FLOAT.wav");
+        const auto s = w.read();
+
+        REQUIRE(s.size() == signal.size());
+        REQUIRE(s.channels() == signal.channels());
+
+        for (size_t n = 0; n < s.size(); ++n)
+        {
+            for (size_t c = 0; c < s.channels(); ++c)
+            {
+                CHECK(s[n][c] == approx(signal[n][c]));
+            }
+        }
+    }
+
+    SECTION("DOUBLE")
+    {
+        audio::wave_file<TestType> w("data/wave_files/DOUBLE.wav");
+        const auto s = w.read();
+
+        REQUIRE(s.size() == signal.size());
+        REQUIRE(s.channels() == signal.channels());
+
+        for (size_t n = 0; n < s.size(); ++n)
+        {
+            for (size_t c = 0; c < s.channels(); ++c)
+            {
+                CHECK(s[n][c] == approx(signal[n][c]));
             }
         }
     }
