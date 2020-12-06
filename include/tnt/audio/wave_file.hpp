@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <fstream>
 #include <limits>
+#include <sstream>
 
 // Assert that data types are the correct size
 static_assert(sizeof(uint8_t)* CHAR_BIT == 8);
@@ -19,6 +20,22 @@ static_assert(sizeof(double)* CHAR_BIT == 64);
 namespace tnt::audio
 {
 
+enum class wave_format
+{
+    PCM = 0x0001,
+    IEEE_FLOAT = 0x0003,
+};
+
+enum class wave_data_type
+{
+    UINT8,
+    INT16,
+    INT24,
+    INT32,
+    FLOAT,
+    DOUBLE,
+};
+
 template <typename T>
 class wave_file final : public file<T>
 {
@@ -26,11 +43,10 @@ public:
 
     explicit wave_file(const std::filesystem::path& path)
         : m_path(path)
-        , m_file(path)
         , m_sample_rate{}
         , m_size{}
         , m_channels{}
-        , m_file_type{}
+        , m_format{}
         , m_data_type{}
         , m_data_position{}
         , m_initialized{}
@@ -39,11 +55,6 @@ public:
         if (!std::filesystem::exists(path))
         {
             return;
-        }
-
-        if (!m_file.is_open())
-        {
-            throw std::runtime_error("Failed to open '" + m_path.string() + "'");
         }
 
         this->initialize();
@@ -82,42 +93,45 @@ public:
 
     virtual multisignal<T> read() override
     {
-        assert(m_initialized);
-        assert(m_file.is_open());
+        std::ifstream file(m_path, std::ios::binary);
+        if (!this->initialized() || !file.is_open())
+        {
+            throw std::runtime_error("Failed to open wave_file '" + m_path.string() + "' for reading");
+        }
 
         // Seek to the start of the data
-        m_file.seekg(m_data_position);
+        file.seekg(m_data_position);
 
         multisignal<T> buffer{ this->sample_rate(), this->size(), this->channels() };
-        std::for_each(buffer.begin(), buffer.end(), [this](auto& samples) {
-            std::for_each(samples.begin(), samples.end(), [this](auto& sample) {
+        std::for_each(buffer.begin(), buffer.end(), [this, &file](auto& samples) {
+            std::for_each(samples.begin(), samples.end(), [this, &file](auto& sample) {
 
                 //TODO: support other formats
                 switch (m_data_type)
                 {
-                    case data_type::PCM_U8:
+                    case wave_data_type::UINT8:
                     {
                         uint8_t value{};
-                        m_file.read(reinterpret_cast<char*>(&value), sizeof(value));
+                        file.read(reinterpret_cast<char*>(&value), sizeof(value));
                         constexpr auto scale = (static_cast<size_t>(std::numeric_limits<uint8_t>::max()) + 1) / 2;
                         sample = (static_cast<T>(value) - scale) / scale;
                         break;
                     }
-                    case data_type::PCM_16:
+                    case wave_data_type::INT16:
                     {
                         int16_t value{};
-                        m_file.read(reinterpret_cast<char*>(&value), sizeof(value));
+                        file.read(reinterpret_cast<char*>(&value), sizeof(value));
                         constexpr auto scale = static_cast<size_t>(std::numeric_limits<int16_t>::max()) + 1;
                         sample = static_cast<T>(value) / scale;
                         break;
                     }
-                    case data_type::PCM_24:
+                    case wave_data_type::INT24:
                     {
                         // No built-in type for 24 bit data
                         constexpr auto int24_max = 0x7FFFFF;
                         std::byte bytes[3]{};
 
-                        m_file.read(reinterpret_cast<char*>(&bytes), sizeof(bytes));
+                        file.read(reinterpret_cast<char*>(&bytes), sizeof(bytes));
                         constexpr auto scale = int24_max + 1;
 
                         // Convert the bytes into a 32 bit value to make processing easier
@@ -134,32 +148,32 @@ public:
                         sample = static_cast<T>(value) / scale;
                         break;
                     }
-                    case data_type::PCM_32:
+                    case wave_data_type::INT32:
                     {
                         int32_t value{};
-                        m_file.read(reinterpret_cast<char*>(&value), sizeof(value));
+                        file.read(reinterpret_cast<char*>(&value), sizeof(value));
                         constexpr auto scale = static_cast<size_t>(std::numeric_limits<int32_t>::max()) + 1;
                         sample = static_cast<T>(value) / scale;
                         break;
                     }
-                    case data_type::FLOAT:
+                    case wave_data_type::FLOAT:
                     {
                         float value{};
-                        m_file.read(reinterpret_cast<char*>(&value), sizeof(value));
+                        file.read(reinterpret_cast<char*>(&value), sizeof(value));
                         sample = static_cast<T>(value);
                         break;
                     }
-                    case data_type::DOUBLE:
+                    case wave_data_type::DOUBLE:
                     {
                         double value{};
-                        m_file.read(reinterpret_cast<char*>(&value), sizeof(value));
+                        file.read(reinterpret_cast<char*>(&value), sizeof(value));
                         sample = static_cast<T>(value);
                         break;
                     }
                     default:
                     {
-                        //TODO: invalid format (should never get here)
-                        throw;
+                        // The code should never get here
+                        throw std::runtime_error("Your hair is on fire!");
                     }
                 }
             });
@@ -170,55 +184,163 @@ public:
 
     virtual void write(const multisignal<T>& data) override
     {
+        this->write(data, wave_format::IEEE_FLOAT, wave_data_type::DOUBLE);
+    }
 
+    virtual void write(const multisignal<T>& data, const wave_format& format)
+    {
+        switch (format)
+        {
+            case wave_format::PCM:
+            {
+                this->write(data, format, wave_data_type::INT32);
+                break;
+            }
+            case wave_format::IEEE_FLOAT:
+            {
+                this->write(data, format, wave_data_type::DOUBLE);
+                break;
+            }
+            default:
+            {
+                std::stringstream format_stream{};
+                format_stream << std::hex << static_cast<size_t>(format);
+                throw std::runtime_error("Invalid format '" + format_stream.str() + "' for wave_file '" + m_path.string() + "'");
+            }
+        }
+    }
+
+    virtual void write(const multisignal<T>& data, const wave_format& format, const wave_data_type& data_type)
+    {
+        std::ofstream file(m_path, std::ios::binary);
+        if (!file.is_open())
+        {
+            throw std::runtime_error("Failed to open wave_file '" + m_path.string() + "' for writing");
+        }
+
+        // Write the RIFF header (size will be updated later)
+        std::streampos riff_size_pos = file.tellp() + std::streamoff(sizeof(header::id));
+        header riff_header = {
+            { 'R', 'I', 'F', 'F' },
+            0,
+        };
+        file.write(reinterpret_cast<char*>(&riff_header), sizeof(riff_header));
+
+        // Write the fmt header (size will be updated later)
+        std::streampos format_size_pos = file.tellp() + std::streamoff(sizeof(header::id));
+        header format_header = {
+            { 'f', 'm', 't', ' ' },
+            sizeof(format_chunk),
+        };
+        
+
+        switch (format)
+        {
+            case wave_format::PCM:
+            {
+                // Set PCM format extension
+                format_ext_pcm format_ext{};
+
+                switch (data_type)
+                {
+                    case wave_data_type::UINT8:
+                    {
+                        format_ext.bits_per_sample = 8;
+                        break;
+                    }
+                    case wave_data_type::INT16:
+                    {
+                        format_ext.bits_per_sample = 16;
+                        break;
+                    }
+                    case wave_data_type::INT24:
+                    {
+                        format_ext.bits_per_sample = 24;
+                        break;
+                    }
+                    case wave_data_type::INT32:
+                    {
+                        format_ext.bits_per_sample = 32;
+                        break;
+                    }
+                    default:
+                    {
+                        //TODO: error
+                        throw;
+                        break;
+                    }
+                }
+
+                break;
+            }
+            case wave_format::IEEE_FLOAT:
+            {
+                // Set IEEE_FLOAT format extension
+                format_ext_ieee_float format_ext{};
+                
+                break;
+            }
+            default:
+            {
+                std::stringstream format_stream{};
+                format_stream << std::hex << static_cast<size_t>(format);
+                throw std::runtime_error("Invalid format '" + format_stream.str() + "' for wave_file '" + m_path.string() + "'");
+            }
+        }
     }
 
 private:
 
     void initialize()
     {
+        std::ifstream file(m_path, std::ios::binary);
+        if (!file.is_open())
+        {
+            throw std::runtime_error("Failed to open wave_file '" + m_path.string() + "'");
+        }
+
         header riff_header{};
-        m_file.read(reinterpret_cast<char*>(&riff_header), sizeof(riff_header));
+        file.read(reinterpret_cast<char*>(&riff_header), sizeof(riff_header));
         if (std::strncmp(riff_header.id, "RIFF", sizeof(riff_header.id)))
         {
             throw std::runtime_error("Invalid RIFF header for wave_file '" + m_path.string() + "'");
         }
 
         char wave[4]{};
-        m_file.read(reinterpret_cast<char*>(&wave), sizeof(wave));
+        file.read(reinterpret_cast<char*>(&wave), sizeof(wave));
         if (std::strncmp(wave, "WAVE", sizeof(wave)))
         {
             throw std::runtime_error("Invalid RIFF format for wave_file '" + m_path.string() + "'");
         }
 
         header format_header{};
-        m_file.read(reinterpret_cast<char*>(&format_header), sizeof(format_header));
+        file.read(reinterpret_cast<char*>(&format_header), sizeof(format_header));
         if (std::strncmp(format_header.id, "fmt ", sizeof(format_header.id)))
         {
             throw std::runtime_error("Invalid fmt header for wave_file '" + m_path.string() + "'");
         }
 
-        format_chunk format{};
-        m_file.read(reinterpret_cast<char*>(&format), sizeof(format));
-        size_t format_bytes_read = sizeof(format);
-        if (m_file.fail())
+        format_chunk format_chunk{};
+        file.read(reinterpret_cast<char*>(&format_chunk), sizeof(format_chunk));
+        size_t format_bytes_read = sizeof(format_chunk);
+        if (file.fail())
         {
             throw std::runtime_error("Error reading format chunk for wave_file '" + m_path.string() + "'");
         }
 
-        m_sample_rate = format.sample_rate;
-        m_channels = format.channels;
+        m_sample_rate = format_chunk.sample_rate;
+        m_channels = format_chunk.channels;
 
-        switch (format.format)
+        switch (format_chunk.format)
         {
-            case file_type::PCM:
+            case wave_format::PCM:
             {
-                m_file_type = file_type::PCM;
+                m_format = wave_format::PCM;
 
                 // Read PCM format extension
-                format_ext_pcm format_ext;
-                m_file.read(reinterpret_cast<char*>(&format_ext), sizeof(format_ext));
-                if (m_file.fail())
+                format_ext_pcm format_ext{};
+                file.read(reinterpret_cast<char*>(&format_ext), sizeof(format_ext));
+                if (file.fail())
                 {
                     throw std::runtime_error("Error reading PCM format extension for wave_file '" + m_path.string() + "'");
                 }
@@ -229,22 +351,22 @@ private:
                 {
                     case 8:
                     {
-                        m_data_type = data_type::PCM_U8;
+                        m_data_type = wave_data_type::UINT8;
                         break;
                     }
                     case 16:
                     {
-                        m_data_type = data_type::PCM_16;
+                        m_data_type = wave_data_type::INT16;
                         break;
                     }
                     case 24:
                     {
-                        m_data_type = data_type::PCM_24;
+                        m_data_type = wave_data_type::INT24;
                         break;
                     }
                     case 32:
                     {
-                        m_data_type = data_type::PCM_32;
+                        m_data_type = wave_data_type::INT32;
                         break;
                     }
                     default:
@@ -255,14 +377,14 @@ private:
 
                 break;
             }
-            case file_type::IEEE_FLOAT:
+            case wave_format::IEEE_FLOAT:
             {
-                m_file_type = file_type::IEEE_FLOAT;
+                m_format = wave_format::IEEE_FLOAT;
 
                 // Read IEEE_FLOAT format extension
                 format_ext_ieee_float format_ext{};
-                m_file.read(reinterpret_cast<char*>(&format_ext), sizeof(format_ext));
-                if (m_file.fail())
+                file.read(reinterpret_cast<char*>(&format_ext), sizeof(format_ext));
+                if (file.fail())
                 {
                     throw std::runtime_error("Error reading IEEE_FLOAT format extension for wave_file '" + m_path.string() + "'");
                 }
@@ -273,12 +395,12 @@ private:
                 {
                     case 32:
                     {
-                        m_data_type = data_type::FLOAT;
+                        m_data_type = wave_data_type::FLOAT;
                         break;
                     }
                     case 64:
                     {
-                        m_data_type = data_type::DOUBLE;
+                        m_data_type = wave_data_type::DOUBLE;
                         break;
                     }
                     default:
@@ -291,42 +413,44 @@ private:
             }
             default:
             {
-                throw std::runtime_error("Invalid WAVE format for wave_file '" + m_path.string() + "'");
+                std::stringstream format_stream{};
+                format_stream << std::hex << format_chunk.format;
+                throw std::runtime_error("Invalid format '" + format_stream.str() + "' for wave_file '" + m_path.string() + "'");
             }
         }
 
         // Ignore any extra data at the end of the format chunk
         if (format_header.size != format_bytes_read)
         {
-            m_file.ignore(format_header.size - format_bytes_read);
-            if (m_file.fail())
+            file.ignore(format_header.size - format_bytes_read);
+            if (file.fail())
             {
                 throw std::runtime_error("Unexpected fmt chunk size for wave_file '" + m_path.string() + "'");
             }
         }
 
         // Keep reading until the start of the data chunk
-        while (!m_file.eof())
+        while (!file.eof())
         {
             header current_header{};
-            m_file.read(reinterpret_cast<char*>(&current_header), sizeof(header));
-            if (m_file.fail())
+            file.read(reinterpret_cast<char*>(&current_header), sizeof(current_header));
+            if (file.fail())
             {
                 throw std::runtime_error("Invalid chunk header found in wave_file '" + m_path.string() + "'");
             }
 
             if (!std::strncmp(current_header.id, "data", 4))
             {
-                m_data_position = m_file.tellg();
-                m_size = current_header.size / format.block_align;
+                m_data_position = file.tellg();
+                m_size = current_header.size / format_chunk.block_align;
                 m_initialized = true;
                 break;
             }
 
-            m_file.ignore(current_header.size);
-            if (m_file.fail())
+            file.ignore(current_header.size);
+            if (file.fail())
             {
-                if (m_file.eof())
+                if (file.eof())
                 {
                     throw std::runtime_error("Unexpected EOF for wave_file '" + m_path.string() + "'");
                 }
@@ -342,22 +466,6 @@ private:
             throw std::runtime_error("Failed to initialize wave_file '" + m_path.string() + "'");
         }
     }
-
-    enum class file_type
-    {
-        PCM = 0x0001,
-        IEEE_FLOAT = 0x0003,
-    };
-
-    enum class data_type
-    {
-        PCM_U8,
-        PCM_16,
-        PCM_24,
-        PCM_32,
-        FLOAT,
-        DOUBLE,
-    };
 
 // Do NOT allow padding of the structures used for reading data
 #pragma pack(push, 1)
@@ -391,9 +499,8 @@ private:
 #pragma pack(pop)
 
     std::filesystem::path m_path;
-    std::ifstream m_file;
-    file_type m_file_type;
-    data_type m_data_type;
+    wave_format m_format;
+    wave_data_type m_data_type;
     size_t m_sample_rate;
     size_t m_size;
     size_t m_channels;

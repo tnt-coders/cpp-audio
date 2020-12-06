@@ -227,4 +227,40 @@ TEMPLATE_TEST_CASE("wave_file::read", "[file][wave_file][read]", float, double)
     }
 
     //TODO: more formats
+
+    SECTION("File doesn't exist")
+    {
+        audio::wave_file<TestType> w("data/wave_files/nonexistent.wav");
+
+        REQUIRE_THROWS_WITH(
+            w.read(),
+            Catch::Matchers::Equals("Failed to open wave_file 'data/wave_files/nonexistent.wav' for reading")
+        );
+    }
+}
+
+TEMPLATE_TEST_CASE("wave_file::write", "[file][wave_file][write]", float, double)
+{
+    const auto signal = signal_from_config<TestType>("data/wave_files/signal.dat");
+
+    SECTION("PCM_U8")
+    {
+        constexpr auto scale = (static_cast<size_t>(std::numeric_limits<uint8_t>::max()) + 1) / 2;
+        constexpr auto epsilon = static_cast<TestType>(1) / scale;
+
+        audio::wave_file<TestType> w("data/wave_files/tmp.wav");
+        w.write(signal, audio::wave_format::PCM, audio::wave_data_type::UINT8);
+        const auto s = w.read();
+
+        REQUIRE(s.size() == signal.size());
+        REQUIRE(s.channels() == signal.channels());
+
+        for (size_t n = 0; n < s.size(); ++n)
+        {
+            for (size_t c = 0; c < s.channels(); ++c)
+            {
+                CHECK(s[n][c] == approx(signal[n][c]).epsilon(epsilon));
+            }
+        }
+    }
 }
