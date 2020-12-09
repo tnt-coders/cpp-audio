@@ -18,18 +18,13 @@ public:
     */
     virtual ~file() = 0;
 
-    /*!
-    \brief 
-    */
-    virtual bool initialized() const = 0;
+    virtual double duration() = 0;
 
-    virtual double duration() const = 0;
+    virtual size_t sample_rate() = 0;
 
-    virtual size_t sample_rate() const = 0;
+    virtual size_t size() = 0;
 
-    virtual size_t size() const = 0;
-
-    virtual size_t channels() const = 0;
+    virtual size_t channels() = 0;
 
     virtual multisignal<T> read() = 0;
 

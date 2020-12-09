@@ -51,52 +51,42 @@ TEMPLATE_TEST_CASE("wave_file construction", "[file][wave_file][constructor]", f
 {
     SECTION("PCM_U8")
     {
-        audio::wave_file<TestType> w("data/wave_files/PCM_U8.wav");
-        CHECK(w.initialized());
+        REQUIRE_NOTHROW(audio::wave_file<TestType>("data/wave_files/PCM_U8.wav"));
     }
 
     SECTION("PCM_16")
     {
-        audio::wave_file<TestType> w("data/wave_files/PCM_16.wav");
-        CHECK(w.initialized());
+        REQUIRE_NOTHROW(audio::wave_file<TestType>("data/wave_files/PCM_16.wav"));
     }
 
     SECTION("PCM_24")
     {
-        audio::wave_file<TestType> w("data/wave_files/PCM_24.wav");
-        CHECK(w.initialized());
+        REQUIRE_NOTHROW(audio::wave_file<TestType>("data/wave_files/PCM_24.wav"));
     }
 
     SECTION("PCM_32")
     {
-        audio::wave_file<TestType> w("data/wave_files/PCM_32.wav");
-        CHECK(w.initialized());
+        REQUIRE_NOTHROW(audio::wave_file<TestType>("data/wave_files/PCM_32.wav"));
     }
 
     SECTION("FLOAT")
     {
-        audio::wave_file<TestType> w("data/wave_files/FLOAT.wav");
-        CHECK(w.initialized());
+        REQUIRE_NOTHROW(audio::wave_file<TestType>("data/wave_files/FLOAT.wav"));
     }
 
     SECTION("DOUBLE")
     {
-        audio::wave_file<TestType> w("data/wave_files/DOUBLE.wav");
-        CHECK(w.initialized());
+        REQUIRE_NOTHROW(audio::wave_file<TestType>("data/wave_files/DOUBLE.wav"));
     }
 
-    SECTION("Invalid file format (empty)")
+    SECTION("File is empty")
     {
-        REQUIRE_THROWS_WITH(
-            audio::wave_file<TestType>("data/wave_files/empty.wav"),
-            Catch::Matchers::Equals("Invalid RIFF header for wave_file 'data/wave_files/empty.wav'")
-        );
+        REQUIRE_NOTHROW(audio::wave_file<TestType>("data/wave_files/empty.wav"));
     }
 
     SECTION("File doesn't exist")
     {
-        audio::wave_file<TestType> w("data/wave_files/nonexistent.wav");
-        CHECK(!w.initialized());
+        REQUIRE_NOTHROW(audio::wave_file<TestType>("data/wave_files/nonexistent.wav"));
     }
 }
 
@@ -105,7 +95,6 @@ TEMPLATE_TEST_CASE("wave_file accessors", "[file][wave_file][accessors]", float,
     const auto signal = signal_from_config<TestType>("data/wave_files/signal.dat");
     audio::wave_file<TestType> w("data/wave_files/DOUBLE.wav");
 
-    CHECK(w.initialized());
     CHECK(w.duration() == signal.duration());
     CHECK(w.sample_rate() == signal.sample_rate());
     CHECK(w.size() == signal.size());
@@ -123,6 +112,11 @@ TEMPLATE_TEST_CASE("wave_file::read", "[file][wave_file][read]", float, double)
 
         audio::wave_file<TestType> w("data/wave_files/PCM_U8.wav");
         const auto s = w.read();
+
+        CHECK(w.duration() == signal.duration());
+        CHECK(w.sample_rate() == signal.sample_rate());
+        CHECK(w.size() == signal.size());
+        CHECK(w.channels() == signal.channels());
 
         REQUIRE(s.size() == signal.size());
         REQUIRE(s.channels() == signal.channels());
@@ -144,6 +138,11 @@ TEMPLATE_TEST_CASE("wave_file::read", "[file][wave_file][read]", float, double)
         audio::wave_file<TestType> w("data/wave_files/PCM_16.wav");
         const auto s = w.read();
 
+        CHECK(w.duration() == signal.duration());
+        CHECK(w.sample_rate() == signal.sample_rate());
+        CHECK(w.size() == signal.size());
+        CHECK(w.channels() == signal.channels());
+
         REQUIRE(s.size() == signal.size());
         REQUIRE(s.channels() == signal.channels());
 
@@ -163,6 +162,11 @@ TEMPLATE_TEST_CASE("wave_file::read", "[file][wave_file][read]", float, double)
         audio::wave_file<TestType> w("data/wave_files/PCM_24.wav");
         const auto s = w.read();
 
+        CHECK(w.duration() == signal.duration());
+        CHECK(w.sample_rate() == signal.sample_rate());
+        CHECK(w.size() == signal.size());
+        CHECK(w.channels() == signal.channels());
+
         REQUIRE(s.size() == signal.size());
         REQUIRE(s.channels() == signal.channels());
 
@@ -179,6 +183,11 @@ TEMPLATE_TEST_CASE("wave_file::read", "[file][wave_file][read]", float, double)
     {
         audio::wave_file<TestType> w("data/wave_files/PCM_32.wav");
         const auto s = w.read();
+
+        CHECK(w.duration() == signal.duration());
+        CHECK(w.sample_rate() == signal.sample_rate());
+        CHECK(w.size() == signal.size());
+        CHECK(w.channels() == signal.channels());
 
         REQUIRE(s.size() == signal.size());
         REQUIRE(s.channels() == signal.channels());
@@ -197,6 +206,11 @@ TEMPLATE_TEST_CASE("wave_file::read", "[file][wave_file][read]", float, double)
         audio::wave_file<TestType> w("data/wave_files/FLOAT.wav");
         const auto s = w.read();
 
+        CHECK(w.duration() == signal.duration());
+        CHECK(w.sample_rate() == signal.sample_rate());
+        CHECK(w.size() == signal.size());
+        CHECK(w.channels() == signal.channels());
+
         REQUIRE(s.size() == signal.size());
         REQUIRE(s.channels() == signal.channels());
 
@@ -213,6 +227,11 @@ TEMPLATE_TEST_CASE("wave_file::read", "[file][wave_file][read]", float, double)
     {
         audio::wave_file<TestType> w("data/wave_files/DOUBLE.wav");
         const auto s = w.read();
+
+        CHECK(w.duration() == signal.duration());
+        CHECK(w.sample_rate() == signal.sample_rate());
+        CHECK(w.size() == signal.size());
+        CHECK(w.channels() == signal.channels());
 
         REQUIRE(s.size() == signal.size());
         REQUIRE(s.channels() == signal.channels());
@@ -234,7 +253,7 @@ TEMPLATE_TEST_CASE("wave_file::read", "[file][wave_file][read]", float, double)
 
         REQUIRE_THROWS_WITH(
             w.read(),
-            Catch::Matchers::Equals("Failed to open wave_file 'data/wave_files/nonexistent.wav' for reading")
+            Catch::Matchers::Equals("Failed to open wave_file 'data/wave_files/nonexistent.wav'")
         );
     }
 }
@@ -250,6 +269,12 @@ TEMPLATE_TEST_CASE("wave_file::write", "[file][wave_file][write]", float, double
 
         audio::wave_file<TestType> w("data/wave_files/tmp.wav");
         w.write(signal, audio::wave_format::PCM, audio::wave_data_type::UINT8);
+
+        CHECK(w.duration() == signal.duration());
+        CHECK(w.sample_rate() == signal.sample_rate());
+        CHECK(w.size() == signal.size());
+        CHECK(w.channels() == signal.channels());
+
         const auto s = w.read();
 
         REQUIRE(s.size() == signal.size());
@@ -260,6 +285,129 @@ TEMPLATE_TEST_CASE("wave_file::write", "[file][wave_file][write]", float, double
             for (size_t c = 0; c < s.channels(); ++c)
             {
                 CHECK(s[n][c] == approx(signal[n][c]).epsilon(epsilon));
+            }
+        }
+    }
+
+    SECTION("PCM_16")
+    {
+        constexpr auto scale = static_cast<size_t>(std::numeric_limits<int16_t>::max()) + 1;
+        constexpr auto epsilon = static_cast<TestType>(1) / scale;
+
+        audio::wave_file<TestType> w("data/wave_files/tmp.wav");
+        w.write(signal, audio::wave_format::PCM, audio::wave_data_type::INT16);
+
+        CHECK(w.duration() == signal.duration());
+        CHECK(w.sample_rate() == signal.sample_rate());
+        CHECK(w.size() == signal.size());
+        CHECK(w.channels() == signal.channels());
+
+        const auto s = w.read();
+
+        REQUIRE(s.size() == signal.size());
+        REQUIRE(s.channels() == signal.channels());
+
+        for (size_t n = 0; n < s.size(); ++n)
+        {
+            for (size_t c = 0; c < s.channels(); ++c)
+            {
+                CHECK(s[n][c] == approx(signal[n][c]).epsilon(epsilon));
+            }
+        }
+    }
+
+    SECTION("PCM_24")
+    {
+        audio::wave_file<TestType> w("data/wave_files/tmp.wav");
+        w.write(signal, audio::wave_format::PCM, audio::wave_data_type::INT24);
+
+        CHECK(w.duration() == signal.duration());
+        CHECK(w.sample_rate() == signal.sample_rate());
+        CHECK(w.size() == signal.size());
+        CHECK(w.channels() == signal.channels());
+
+        const auto s = w.read();
+
+        REQUIRE(s.size() == signal.size());
+        REQUIRE(s.channels() == signal.channels());
+
+        for (size_t n = 0; n < s.size(); ++n)
+        {
+            for (size_t c = 0; c < s.channels(); ++c)
+            {
+                CHECK(s[n][c] == approx(signal[n][c]));
+            }
+        }
+    }
+
+    SECTION("PCM_32")
+    {
+        audio::wave_file<TestType> w("data/wave_files/tmp.wav");
+        w.write(signal, audio::wave_format::PCM, audio::wave_data_type::INT32);
+
+        CHECK(w.duration() == signal.duration());
+        CHECK(w.sample_rate() == signal.sample_rate());
+        CHECK(w.size() == signal.size());
+        CHECK(w.channels() == signal.channels());
+
+        const auto s = w.read();
+
+        REQUIRE(s.size() == signal.size());
+        REQUIRE(s.channels() == signal.channels());
+
+        for (size_t n = 0; n < s.size(); ++n)
+        {
+            for (size_t c = 0; c < s.channels(); ++c)
+            {
+                CHECK(s[n][c] == approx(signal[n][c]));
+            }
+        }
+    }
+
+    SECTION("FLOAT")
+    {
+        audio::wave_file<TestType> w("data/wave_files/tmp.wav");
+        w.write(signal, audio::wave_format::IEEE_FLOAT, audio::wave_data_type::FLOAT);
+
+        CHECK(w.duration() == signal.duration());
+        CHECK(w.sample_rate() == signal.sample_rate());
+        CHECK(w.size() == signal.size());
+        CHECK(w.channels() == signal.channels());
+
+        const auto s = w.read();
+
+        REQUIRE(s.size() == signal.size());
+        REQUIRE(s.channels() == signal.channels());
+
+        for (size_t n = 0; n < s.size(); ++n)
+        {
+            for (size_t c = 0; c < s.channels(); ++c)
+            {
+                CHECK(s[n][c] == approx(signal[n][c]));
+            }
+        }
+    }
+
+    SECTION("DOUBLE")
+    {
+        audio::wave_file<TestType> w("data/wave_files/tmp.wav");
+        w.write(signal, audio::wave_format::IEEE_FLOAT, audio::wave_data_type::DOUBLE);
+
+        CHECK(w.duration() == signal.duration());
+        CHECK(w.sample_rate() == signal.sample_rate());
+        CHECK(w.size() == signal.size());
+        CHECK(w.channels() == signal.channels());
+
+        const auto s = w.read();
+
+        REQUIRE(s.size() == signal.size());
+        REQUIRE(s.channels() == signal.channels());
+
+        for (size_t n = 0; n < s.size(); ++n)
+        {
+            for (size_t c = 0; c < s.channels(); ++c)
+            {
+                CHECK(s[n][c] == approx(signal[n][c]));
             }
         }
     }
