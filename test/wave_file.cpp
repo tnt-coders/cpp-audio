@@ -12,41 +12,6 @@
 
 using namespace tnt;
 
-//TODO: Make more flexible so different channels can have different signal types
-template <typename T>
-dsp::multisignal<T> signal_from_config(const std::filesystem::path& path)
-{
-    const auto config = read_config(path);
-    const auto type = config.at("type");
-    const auto sample_rate = std::stoull(config.at("sample_rate"));
-    const auto frequency = static_cast<T>(std::stod(config.at("frequency")));
-    const auto channels = std::stoull(config.at("channels"));
-    const auto size = std::stoull(config.at("size"));
-    const auto g = dsp::signal_generator<T>(sample_rate, size);
-
-    dsp::multisignal<T> signal(sample_rate, size);
-    if (type == "cos")
-    {
-        for (size_t c = 0; c < channels; ++c)
-        {
-            signal.add_channel(g.cosine(frequency));
-        }
-        return signal;
-    }
-    else if (type == "sin")
-    {
-        for (size_t c = 0; c < channels; ++c)
-        {
-            signal.add_channel(g.sine(frequency));
-        }
-        return signal;
-    }
-    else
-    {
-        throw std::runtime_error("Invalid config value for 'type' in" + path.string());
-    }
-}
-
 TEMPLATE_TEST_CASE("wave_file construction", "[file][wave_file][constructor]", float, double)
 {
     SECTION("PCM_U8")
@@ -111,12 +76,13 @@ TEMPLATE_TEST_CASE("wave_file::read", "[file][wave_file][read]", float, double)
         constexpr auto epsilon = static_cast<TestType>(1) / scale;
 
         audio::wave_file<TestType> w("data/wave_files/PCM_U8.wav");
-        const auto s = w.read();
 
         CHECK(w.duration() == signal.duration());
         CHECK(w.sample_rate() == signal.sample_rate());
         CHECK(w.size() == signal.size());
         CHECK(w.channels() == signal.channels());
+
+        const auto s = w.read();
 
         REQUIRE(s.size() == signal.size());
         REQUIRE(s.channels() == signal.channels());
@@ -136,12 +102,13 @@ TEMPLATE_TEST_CASE("wave_file::read", "[file][wave_file][read]", float, double)
         constexpr auto epsilon = static_cast<TestType>(1) / scale;
 
         audio::wave_file<TestType> w("data/wave_files/PCM_16.wav");
-        const auto s = w.read();
 
         CHECK(w.duration() == signal.duration());
         CHECK(w.sample_rate() == signal.sample_rate());
         CHECK(w.size() == signal.size());
         CHECK(w.channels() == signal.channels());
+
+        const auto s = w.read();
 
         REQUIRE(s.size() == signal.size());
         REQUIRE(s.channels() == signal.channels());
@@ -158,14 +125,14 @@ TEMPLATE_TEST_CASE("wave_file::read", "[file][wave_file][read]", float, double)
     SECTION("PCM_24")
     {
         // No need to use "epsilon" anymore because 24 bit data is more accurate
-
         audio::wave_file<TestType> w("data/wave_files/PCM_24.wav");
-        const auto s = w.read();
 
         CHECK(w.duration() == signal.duration());
         CHECK(w.sample_rate() == signal.sample_rate());
         CHECK(w.size() == signal.size());
         CHECK(w.channels() == signal.channels());
+
+        const auto s = w.read();
 
         REQUIRE(s.size() == signal.size());
         REQUIRE(s.channels() == signal.channels());
@@ -182,12 +149,13 @@ TEMPLATE_TEST_CASE("wave_file::read", "[file][wave_file][read]", float, double)
     SECTION("PCM_32")
     {
         audio::wave_file<TestType> w("data/wave_files/PCM_32.wav");
-        const auto s = w.read();
 
         CHECK(w.duration() == signal.duration());
         CHECK(w.sample_rate() == signal.sample_rate());
         CHECK(w.size() == signal.size());
         CHECK(w.channels() == signal.channels());
+
+        const auto s = w.read();
 
         REQUIRE(s.size() == signal.size());
         REQUIRE(s.channels() == signal.channels());
@@ -204,12 +172,13 @@ TEMPLATE_TEST_CASE("wave_file::read", "[file][wave_file][read]", float, double)
     SECTION("FLOAT")
     {
         audio::wave_file<TestType> w("data/wave_files/FLOAT.wav");
-        const auto s = w.read();
 
         CHECK(w.duration() == signal.duration());
         CHECK(w.sample_rate() == signal.sample_rate());
         CHECK(w.size() == signal.size());
         CHECK(w.channels() == signal.channels());
+
+        const auto s = w.read();
 
         REQUIRE(s.size() == signal.size());
         REQUIRE(s.channels() == signal.channels());
@@ -226,12 +195,13 @@ TEMPLATE_TEST_CASE("wave_file::read", "[file][wave_file][read]", float, double)
     SECTION("DOUBLE")
     {
         audio::wave_file<TestType> w("data/wave_files/DOUBLE.wav");
-        const auto s = w.read();
 
         CHECK(w.duration() == signal.duration());
         CHECK(w.sample_rate() == signal.sample_rate());
         CHECK(w.size() == signal.size());
         CHECK(w.channels() == signal.channels());
+
+        const auto s = w.read();
 
         REQUIRE(s.size() == signal.size());
         REQUIRE(s.channels() == signal.channels());

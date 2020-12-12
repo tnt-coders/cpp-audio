@@ -21,12 +21,18 @@ static_assert(sizeof(double)* CHAR_BIT == 64);
 namespace tnt::audio
 {
 
+/*!
+\brief Represents valid wave file formats
+*/
 enum class wave_format
 {
     PCM = 0x0001,
     IEEE_FLOAT = 0x0003,
 };
 
+/*!
+\brief Represents valid wave file data types
+*/
 enum class wave_data_type
 {
     UINT8,
@@ -37,11 +43,18 @@ enum class wave_data_type
     DOUBLE,
 };
 
+/*!
+\brief Wave file object used to read and write wave files
+*/
 template <typename T>
 class wave_file final : public file<T>
 {
 public:
 
+    /*!
+    \brief Constructor
+    \param[in] path Path to the wave file on the system
+    */
     explicit wave_file(const std::filesystem::path& path)
         : m_path(path)
         , m_sample_rate{}
@@ -53,8 +66,14 @@ public:
         , m_initialized{}
     {}
 
+    /*!
+    \brief Destructor
+    */
     virtual ~wave_file() override = default;
 
+    /*!
+    \copydoc file::duration()
+    */
     virtual double duration() override
     {
         if (!m_initialized)
@@ -65,6 +84,9 @@ public:
         return this->size() / static_cast<double>(this->sample_rate());
     }
 
+    /*!
+    \copydoc file::sample_rate()
+    */
     virtual size_t sample_rate() override
     {
         if (!m_initialized)
@@ -75,6 +97,9 @@ public:
         return m_sample_rate;
     }
 
+    /*!
+    \copydoc file::size()
+    */
     virtual size_t size() override
     {
         if (!m_initialized)
@@ -85,6 +110,9 @@ public:
         return m_size;
     }
 
+    /*!
+    \copydoc file::channels()
+    */
     virtual size_t channels() override
     {
         if (!m_initialized)
@@ -95,6 +123,9 @@ public:
         return m_channels;
     }
 
+    /*!
+    \copydoc file::read()
+    */
     virtual multisignal<T> read() override
     {
         if (!m_initialized)
@@ -190,11 +221,19 @@ public:
         return signal;
     }
 
+    /*!
+    \copydoc file::write(const multisignal<T>& signal)
+    */
     virtual void write(const multisignal<T>& signal) override
     {
         this->write(signal, wave_format::IEEE_FLOAT, wave_data_type::DOUBLE);
     }
 
+    /*!
+    \brief Writes a wave file in the specified format
+    \param[in] signal Multi-channel signal containing audio data to write to the file
+    \param[in] format Format to write the wave file in
+    */
     virtual void write(const multisignal<T>& signal, const wave_format& format)
     {
         switch (format)
@@ -218,6 +257,12 @@ public:
         }
     }
 
+    /*!
+    \brief Writes a wave file in the specified format with the specified data type
+    \param[in] signal Multi-channel signal containing audio data to write to the file
+    \param[in] format Format to write the wave file in
+    \param[in] data_type Data type to store the data in
+    */
     virtual void write(const multisignal<T>& signal, const wave_format& format, const wave_data_type& data_type)
     {
         header riff_header{};

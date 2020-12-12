@@ -1,4 +1,5 @@
 #include "approx.hpp"
+#include "config.hpp"
 #include <catch2/catch_template_test_macros.hpp>
 #include <tnt/audio/io.hpp>
 
@@ -6,34 +7,179 @@ using namespace tnt;
 
 TEMPLATE_TEST_CASE("file", "[file]", double, float)
 {
-    //const auto file = audio::file<TestType>("sinewave_64bit_100Hz_1000Hz-sample-rate_10-size_1-channels.wav");
-    //const auto file = audio::file<TestType>("untitled.wav");
-    //const auto signal = file->read();
-}
+    const auto signal = signal_from_config<TestType>("data/wave_files/signal.dat");
 
-//#include "approx.hpp"
-//
-//#include <tnt/audio/io.hpp>
-//#include <tnt/audio/multisignal.hpp>
-//#include <tnt/dsp/signal_generator.hpp>
-//
-//using namespace tnt;
-//
-//TEMPLATE_TEST_CASE("read", "[read]", double, float)
-//{
-//    const auto g = dsp::signal_generator<TestType>{ 1000, 10 };
-//    const auto sine = g.sine(100);
-//
-//    SECTION("Read a .wav file")
-//    {
-//        const auto signal = audio::read<TestType>("sinewave_64bit_100Hz_1000Hz-sample-rate_10-size_1-channels.wav");
-//
-//        REQUIRE(signal.size() == sine.size());
-//        REQUIRE(signal.channels() == 1);
-//
-//        for (size_t n = 0; n < signal.size(); ++n)
-//        {
-//            CHECK(signal[n][0] == approx(sine[n]));
-//        }
-//    }
-//}
+    SECTION("wave_file")
+    {
+        SECTION("read")
+        {
+            SECTION("PCM_U8")
+            {
+                constexpr auto scale = (static_cast<size_t>(std::numeric_limits<uint8_t>::max()) + 1) / 2;
+                constexpr auto epsilon = static_cast<TestType>(1) / scale;
+
+                const auto file = audio::make_file<TestType>("data/wave_files/PCM_U8.wav");
+
+                CHECK(file->duration() == signal.duration());
+                CHECK(file->sample_rate() == signal.sample_rate());
+                CHECK(file->size() == signal.size());
+                CHECK(file->channels() == signal.channels());
+
+                const auto s = file->read();
+
+                REQUIRE(s.size() == signal.size());
+                REQUIRE(s.channels() == signal.channels());
+
+                for (size_t n = 0; n < s.size(); ++n)
+                {
+                    for (size_t c = 0; c < s.channels(); ++c)
+                    {
+                        CHECK(s[n][c] == approx(signal[n][c]).epsilon(epsilon));
+                    }
+                }
+            }
+
+            SECTION("PCM_16")
+            {
+                constexpr auto scale = static_cast<size_t>(std::numeric_limits<int16_t>::max()) + 1;
+                constexpr auto epsilon = static_cast<TestType>(1) / scale;
+
+                const auto file = audio::make_file<TestType>("data/wave_files/PCM_16.wav");
+
+                CHECK(file->duration() == signal.duration());
+                CHECK(file->sample_rate() == signal.sample_rate());
+                CHECK(file->size() == signal.size());
+                CHECK(file->channels() == signal.channels());
+
+                const auto s = file->read();
+
+                REQUIRE(s.size() == signal.size());
+                REQUIRE(s.channels() == signal.channels());
+
+                for (size_t n = 0; n < s.size(); ++n)
+                {
+                    for (size_t c = 0; c < s.channels(); ++c)
+                    {
+                        CHECK(s[n][c] == approx(signal[n][c]).epsilon(epsilon));
+                    }
+                }
+            }
+
+            SECTION("PCM_24")
+            {
+                const auto file = audio::make_file<TestType>("data/wave_files/PCM_24.wav");
+
+                CHECK(file->duration() == signal.duration());
+                CHECK(file->sample_rate() == signal.sample_rate());
+                CHECK(file->size() == signal.size());
+                CHECK(file->channels() == signal.channels());
+
+                const auto s = file->read();
+
+                REQUIRE(s.size() == signal.size());
+                REQUIRE(s.channels() == signal.channels());
+
+                for (size_t n = 0; n < s.size(); ++n)
+                {
+                    for (size_t c = 0; c < s.channels(); ++c)
+                    {
+                        CHECK(s[n][c] == approx(signal[n][c]));
+                    }
+                }
+            }
+
+            SECTION("PCM_32")
+            {
+                const auto file = audio::make_file<TestType>("data/wave_files/PCM_32.wav");
+
+                CHECK(file->duration() == signal.duration());
+                CHECK(file->sample_rate() == signal.sample_rate());
+                CHECK(file->size() == signal.size());
+                CHECK(file->channels() == signal.channels());
+
+                const auto s = file->read();
+
+                REQUIRE(s.size() == signal.size());
+                REQUIRE(s.channels() == signal.channels());
+
+                for (size_t n = 0; n < s.size(); ++n)
+                {
+                    for (size_t c = 0; c < s.channels(); ++c)
+                    {
+                        CHECK(s[n][c] == approx(signal[n][c]));
+                    }
+                }
+            }
+
+            SECTION("FLOAT")
+            {
+                const auto file = audio::make_file<TestType>("data/wave_files/FLOAT.wav");
+
+                CHECK(file->duration() == signal.duration());
+                CHECK(file->sample_rate() == signal.sample_rate());
+                CHECK(file->size() == signal.size());
+                CHECK(file->channels() == signal.channels());
+
+                const auto s = file->read();
+
+                REQUIRE(s.size() == signal.size());
+                REQUIRE(s.channels() == signal.channels());
+
+                for (size_t n = 0; n < s.size(); ++n)
+                {
+                    for (size_t c = 0; c < s.channels(); ++c)
+                    {
+                        CHECK(s[n][c] == approx(signal[n][c]));
+                    }
+                }
+            }
+
+            SECTION("DOUBLE")
+            {
+                const auto file = audio::make_file<TestType>("data/wave_files/DOUBLE.wav");
+
+                CHECK(file->duration() == signal.duration());
+                CHECK(file->sample_rate() == signal.sample_rate());
+                CHECK(file->size() == signal.size());
+                CHECK(file->channels() == signal.channels());
+
+                const auto s = file->read();
+
+                REQUIRE(s.size() == signal.size());
+                REQUIRE(s.channels() == signal.channels());
+
+                for (size_t n = 0; n < s.size(); ++n)
+                {
+                    for (size_t c = 0; c < s.channels(); ++c)
+                    {
+                        CHECK(s[n][c] == approx(signal[n][c]));
+                    }
+                }
+            }
+        }
+
+        SECTION("write")
+        {
+            const auto file = audio::make_file<TestType>("data/wave_files/tmp.wav");
+            file->write(signal);
+
+            CHECK(file->duration() == signal.duration());
+            CHECK(file->sample_rate() == signal.sample_rate());
+            CHECK(file->size() == signal.size());
+            CHECK(file->channels() == signal.channels());
+
+            const auto s = file->read();
+
+            REQUIRE(s.size() == signal.size());
+            REQUIRE(s.channels() == signal.channels());
+
+            for (size_t n = 0; n < s.size(); ++n)
+            {
+                for (size_t c = 0; c < s.channels(); ++c)
+                {
+                    CHECK(s[n][c] == approx(signal[n][c]));
+                }
+            }
+        }
+    }
+}
