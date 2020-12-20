@@ -1,5 +1,5 @@
-tnt_project_AddLibrary(${PROJECT_NAME} TARGET audio INTERFACE)
+tnt_project_AddLibrary(${PROJECT_NAME} TARGET ${PROJECT_NAME} INTERFACE)
 
-target_compile_features(audio INTERFACE cxx_std_17)
+target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_17)
 
-target_link_libraries(audio INTERFACE tnt::dsp)
+target_link_libraries(${PROJECT_NAME} INTERFACE tnt::dsp)

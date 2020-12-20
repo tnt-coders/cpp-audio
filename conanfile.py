@@ -8,9 +8,9 @@ class CppAudio(ConanFile):
     exports_sources = "CMakeLists.txt", "docs/*", "include/*", "src/*", "test/*"
     generators = "cmake", "cmake_paths"
     license = "GNU Lesser General Public License v3.0"
-    name = "cpp-audio"
+    name = "audio"
     options = {"shared": [True, False]}
-    requires = "cpp-dsp/1.0.0"
+    requires = "dsp/1.0.0@tnt-coders/testing"
     settings = "os", "compiler", "build_type", "arch"
     topics = ("audio")
     url = "https://github.com/tnt-coders/cpp-audio"

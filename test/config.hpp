@@ -10,7 +10,7 @@ std::unordered_map<std::string, std::string> read_config(const std::filesystem::
 
 //TODO: Make more flexible so different channels can have different signal types
 template <typename T>
-tnt::audio::multisignal<T> signal_from_config(const std::filesystem::path& path)
+tnt::audio::Multisignal<T> signal_from_config(const std::filesystem::path& path)
 {
     const auto config = read_config(path);
     const auto type = config.at("type");
@@ -18,9 +18,9 @@ tnt::audio::multisignal<T> signal_from_config(const std::filesystem::path& path)
     const auto frequency = static_cast<T>(std::stod(config.at("frequency")));
     const auto channels = std::stoull(config.at("channels"));
     const auto size = std::stoull(config.at("size"));
-    const auto g = tnt::dsp::signal_generator<T>(sample_rate, size);
+    const auto g = tnt::dsp::SignalGenerator<T>(sample_rate, size);
 
-    tnt::audio::multisignal<T> signal(sample_rate, size);
+    tnt::audio::Multisignal<T> signal(sample_rate, size);
     if (type == "cos")
     {
         for (size_t c = 0; c < channels; ++c)

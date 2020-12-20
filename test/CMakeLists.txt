@@ -3,7 +3,7 @@ include(Catch)
 # Copy data files to the binary directory
 file(COPY data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-add_executable(audio_test
+add_executable(${PROJECT_NAME}_test
     main.cpp
     approx.cpp
     config.cpp
@@ -12,13 +12,12 @@ add_executable(audio_test
     multisignal.cpp
     signal.cpp
     wave_file.cpp
-    #TODO: others
 )
 
-target_link_libraries(audio_test
-    tnt::audio
+target_link_libraries(${PROJECT_NAME}_test
+    tnt::${PROJECT_NAME}
     tnt::dsp
     Catch2::Catch2WithMain
 )
 
-catch_discover_tests(audio_test)
+catch_discover_tests(${PROJECT_NAME}_test)

@@ -9,14 +9,14 @@ namespace tnt::audio
 \brief File object used to read/write audio data
 */
 template <typename T>
-class file
+class File
 {
 public:
 
     /*!
     \brief Destructor
     */
-    virtual ~file() = 0;
+    virtual ~File() = 0;
 
     /*!
     \brief Gets the duration of the audio file in seconds
@@ -46,17 +46,17 @@ public:
     \brief Reads the audio data from the file
     \return Multi-channel signal containing the audio data
     */
-    virtual multisignal<T> read() = 0;
+    virtual Multisignal<T> read() = 0;
 
     /*!
     \brief Writes audio data to the file
     \param[in] signal Multi-channel signal containing audio data to write to the file
     */
-    virtual void write(const multisignal<T>& signal) = 0;
+    virtual void write(const Multisignal<T>& signal) = 0;
 };
 
 // Even abstract destructors need a definition
 template<typename T>
-file<T>::~file() = default;
+File<T>::~File() = default;
 
 } /* namespace tnt::audio */
