@@ -1,4 +1,5 @@
 #include "config.hpp"
+
 #include <filesystem>
 #include <fstream>
 #include <regex>
@@ -6,18 +7,18 @@
 #include <unordered_map>
 #include <utility>
 
-
 std::unordered_map<std::string, std::string> read_config(const std::filesystem::path& path)
 {
-    std::ifstream config_file{ path };
+    std::ifstream config_file{path};
     if (!config_file.is_open())
     {
-        //TODO: error;
+        // TODO: error;
         throw;
     }
 
     std::unordered_map<std::string, std::string> config{};
-    std::regex regex{ "([^:]+):([^:]+)" };
+
+    std::regex regex{"([^:]+):([^:]+)"};
     for (std::string line; std::getline(config_file, line);)
     {
         std::smatch match;
@@ -27,11 +28,11 @@ std::unordered_map<std::string, std::string> read_config(const std::filesystem::
         }
         else
         {
-            //TODO: error
+            // TODO: error
             throw;
         }
     }
 
-    //TODO: implement
+    // TODO: implement
     return config;
 }

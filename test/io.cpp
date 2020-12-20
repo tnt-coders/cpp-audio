@@ -1,5 +1,6 @@
 #include "approx.hpp"
 #include "config.hpp"
+
 #include <catch2/catch_template_test_macros.hpp>
 #include <tnt/audio/io.hpp>
 
@@ -15,7 +16,10 @@ TEMPLATE_TEST_CASE("file", "[file]", double, float)
         {
             SECTION("PCM_U8")
             {
-                constexpr auto scale = (static_cast<size_t>(std::numeric_limits<uint8_t>::max()) + 1) / 2;
+                constexpr auto scale = (static_cast<size_t>(std::numeric_limits<uint8_t>::max())
+                                        + 1)
+                                     / 2;
+
                 constexpr auto epsilon = static_cast<TestType>(1) / scale;
 
                 const auto file = audio::file<TestType>("data/wave_files/PCM_U8.wav");
@@ -42,6 +46,7 @@ TEMPLATE_TEST_CASE("file", "[file]", double, float)
             SECTION("PCM_16")
             {
                 constexpr auto scale = static_cast<size_t>(std::numeric_limits<int16_t>::max()) + 1;
+
                 constexpr auto epsilon = static_cast<TestType>(1) / scale;
 
                 const auto file = audio::file<TestType>("data/wave_files/PCM_16.wav");

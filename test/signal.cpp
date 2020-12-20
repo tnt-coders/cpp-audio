@@ -6,7 +6,7 @@ using namespace tnt;
 
 TEMPLATE_TEST_CASE("Signal conversion", "[Signal][conversion]", double, float)
 {
-    audio::Signal<TestType> x{ 1000 };
+    audio::Signal<TestType> x(1000);
 
     // Check that audio::signals can be passed to functions that take dsp::signals
     CHECK(signal_conversion(x));

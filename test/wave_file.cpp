@@ -1,5 +1,6 @@
 #include "approx.hpp"
 #include "config.hpp"
+
 #include <catch2/catch_template_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
 #include <filesystem>
@@ -58,6 +59,7 @@ TEMPLATE_TEST_CASE("WaveFile construction", "[file][WaveFile][constructor]", flo
 TEMPLATE_TEST_CASE("WaveFile accessors", "[file][WaveFile][accessors]", float, double)
 {
     const auto signal = signal_from_config<TestType>("data/wave_files/signal.dat");
+
     audio::WaveFile<TestType> w("data/wave_files/DOUBLE.wav");
 
     CHECK(w.duration() == signal.duration());
@@ -73,6 +75,7 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
     SECTION("PCM_U8")
     {
         constexpr auto scale = (static_cast<size_t>(std::numeric_limits<uint8_t>::max()) + 1) / 2;
+
         constexpr auto epsilon = static_cast<TestType>(1) / scale;
 
         audio::WaveFile<TestType> w("data/wave_files/PCM_U8.wav");
@@ -99,6 +102,7 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
     SECTION("PCM_16")
     {
         constexpr auto scale = static_cast<size_t>(std::numeric_limits<int16_t>::max() + 1);
+
         constexpr auto epsilon = static_cast<TestType>(1) / scale;
 
         audio::WaveFile<TestType> w("data/wave_files/PCM_16.wav");
@@ -215,7 +219,7 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
         }
     }
 
-    //TODO: more formats
+    // TODO: more formats
 
     SECTION("File doesn't exist")
     {
@@ -223,8 +227,8 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
 
         REQUIRE_THROWS_WITH(
             w.read(),
-            Catch::Matchers::Equals("Failed to open WaveFile 'data/wave_files/nonexistent.wav' for reading")
-        );
+            Catch::Matchers::Equals(
+                "Failed to open WaveFile 'data/wave_files/nonexistent.wav' for reading"));
     }
 }
 
@@ -235,6 +239,7 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
     SECTION("PCM_U8")
     {
         constexpr auto scale = (static_cast<size_t>(std::numeric_limits<uint8_t>::max()) + 1) / 2;
+
         constexpr auto epsilon = static_cast<TestType>(1) / scale;
 
         audio::WaveFile<TestType> w("data/wave_files/tmp.wav");
@@ -262,6 +267,7 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
     SECTION("PCM_16")
     {
         constexpr auto scale = static_cast<size_t>(std::numeric_limits<int16_t>::max()) + 1;
+
         constexpr auto epsilon = static_cast<TestType>(1) / scale;
 
         audio::WaveFile<TestType> w("data/wave_files/tmp.wav");

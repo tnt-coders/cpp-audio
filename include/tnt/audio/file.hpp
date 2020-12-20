@@ -12,7 +12,6 @@ template <typename T>
 class File
 {
 public:
-
     /*!
     \brief Destructor
     */
@@ -56,7 +55,7 @@ public:
 };
 
 // Even abstract destructors need a definition
-template<typename T>
+template <typename T>
 File<T>::~File() = default;
 
 } /* namespace tnt::audio */
