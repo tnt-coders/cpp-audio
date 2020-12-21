@@ -730,4 +730,4 @@ private:
     bool                  m_initialized;
 };
 
-} /* namespace tnt::audio */
+}  // namespace tnt::audio

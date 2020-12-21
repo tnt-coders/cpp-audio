@@ -31,4 +31,4 @@ std::unique_ptr<File<T>> file(const std::filesystem::path& path)
     throw std::runtime_error("Unrecognized file extension for audio file '" + path.string() + "'");
 }
 
-} /* namespace tnt::audio */
+}  // namespace tnt::audio

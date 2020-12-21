@@ -58,4 +58,4 @@ public:
 template <typename T>
 File<T>::~File() = default;
 
-} /* namespace tnt::audio */
+}  // namespace tnt::audio

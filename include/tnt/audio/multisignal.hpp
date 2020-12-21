@@ -11,4 +11,4 @@ namespace tnt::audio
 template <typename T>
 using Multisignal = dsp::Multisignal<T>;
 
-} /* namespace tnt::audio */
+}  // namespace tnt::audio

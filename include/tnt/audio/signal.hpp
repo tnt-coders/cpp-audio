@@ -11,4 +11,4 @@ namespace tnt::audio
 template <typename T>
 using Signal = dsp::Signal<T>;
 
-} /* namespace tnt::audio */
+}  // namespace tnt::audio
