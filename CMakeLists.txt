@@ -22,6 +22,7 @@ tnt_project_ConanInstall(${PROJECT_NAME})
 include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 find_package(Catch2 REQUIRED)
 find_package(dsp REQUIRED)
+find_package(math REQUIRED)
 
 # Enable testing for the project
 # Note: must be in top level CMakeLists.txt

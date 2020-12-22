@@ -1,7 +1,7 @@
-#include "approx.hpp"
 #include "config.hpp"
 
 #include <catch2/catch_template_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
 #include <filesystem>
 #include <stdexcept>
@@ -10,6 +10,7 @@
 #include <tnt/dsp/multisignal.hpp>
 #include <tnt/dsp/signal.hpp>
 #include <tnt/dsp/signal_generator.hpp>
+#include <tnt/math/comparison.hpp>
 
 using namespace tnt;
 
@@ -76,7 +77,7 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
     {
         constexpr auto scale = (static_cast<size_t>(std::numeric_limits<uint8_t>::max()) + 1) / 2;
 
-        constexpr auto epsilon = static_cast<TestType>(1) / scale;
+        constexpr auto margin = static_cast<TestType>(1) / scale;
 
         audio::WaveFile<TestType> w("data/wave_files/PCM_U8.wav");
 
@@ -94,7 +95,7 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
         {
             for (size_t c = 0; c < s.channels(); ++c)
             {
-                CHECK(s[n][c] == approx(signal[n][c]).epsilon(epsilon));
+                CHECK_THAT(s[n][c], Catch::Matchers::WithinAbs(signal[n][c], margin));
             }
         }
     }
@@ -103,7 +104,7 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
     {
         constexpr auto scale = static_cast<size_t>(std::numeric_limits<int16_t>::max() + 1);
 
-        constexpr auto epsilon = static_cast<TestType>(1) / scale;
+        constexpr auto margin = static_cast<TestType>(1) / scale;
 
         audio::WaveFile<TestType> w("data/wave_files/PCM_16.wav");
 
@@ -121,14 +122,14 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
         {
             for (size_t c = 0; c < s.channels(); ++c)
             {
-                CHECK(s[n][c] == approx(signal[n][c]).epsilon(epsilon));
+                CHECK_THAT(s[n][c], Catch::Matchers::WithinAbs(signal[n][c], margin));
             }
         }
     }
 
     SECTION("PCM_24")
     {
-        // No need to use "epsilon" anymore because 24 bit data is more accurate
+        // No need to use "margin" anymore because 24 bit data is more accurate
         audio::WaveFile<TestType> w("data/wave_files/PCM_24.wav");
 
         CHECK(w.duration() == signal.duration());
@@ -145,7 +146,7 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
         {
             for (size_t c = 0; c < s.channels(); ++c)
             {
-                CHECK(s[n][c] == approx(signal[n][c]));
+                CHECK(math::near(s[n][c], signal[n][c]));
             }
         }
     }
@@ -168,7 +169,7 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
         {
             for (size_t c = 0; c < s.channels(); ++c)
             {
-                CHECK(s[n][c] == approx(signal[n][c]));
+                CHECK(math::near(s[n][c], signal[n][c]));
             }
         }
     }
@@ -191,7 +192,7 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
         {
             for (size_t c = 0; c < s.channels(); ++c)
             {
-                CHECK(s[n][c] == approx(signal[n][c]));
+                CHECK(math::near(s[n][c], signal[n][c]));
             }
         }
     }
@@ -214,7 +215,7 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
         {
             for (size_t c = 0; c < s.channels(); ++c)
             {
-                CHECK(s[n][c] == approx(signal[n][c]));
+                CHECK(math::near(s[n][c], signal[n][c]));
             }
         }
     }
@@ -240,7 +241,7 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
     {
         constexpr auto scale = (static_cast<size_t>(std::numeric_limits<uint8_t>::max()) + 1) / 2;
 
-        constexpr auto epsilon = static_cast<TestType>(1) / scale;
+        constexpr auto margin = static_cast<TestType>(1) / scale;
 
         audio::WaveFile<TestType> w("data/wave_files/tmp.wav");
         w.write(signal, audio::WaveFormat::PCM, audio::WaveDataType::UINT8);
@@ -259,7 +260,7 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         {
             for (size_t c = 0; c < s.channels(); ++c)
             {
-                CHECK(s[n][c] == approx(signal[n][c]).epsilon(epsilon));
+                CHECK_THAT(s[n][c], Catch::Matchers::WithinAbs(signal[n][c], margin));
             }
         }
     }
@@ -268,7 +269,7 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
     {
         constexpr auto scale = static_cast<size_t>(std::numeric_limits<int16_t>::max()) + 1;
 
-        constexpr auto epsilon = static_cast<TestType>(1) / scale;
+        constexpr auto margin = static_cast<TestType>(1) / scale;
 
         audio::WaveFile<TestType> w("data/wave_files/tmp.wav");
         w.write(signal, audio::WaveFormat::PCM, audio::WaveDataType::INT16);
@@ -287,7 +288,7 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         {
             for (size_t c = 0; c < s.channels(); ++c)
             {
-                CHECK(s[n][c] == approx(signal[n][c]).epsilon(epsilon));
+                CHECK_THAT(s[n][c], Catch::Matchers::WithinAbs(signal[n][c], margin));
             }
         }
     }
@@ -311,7 +312,7 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         {
             for (size_t c = 0; c < s.channels(); ++c)
             {
-                CHECK(s[n][c] == approx(signal[n][c]));
+                CHECK(math::near(s[n][c], signal[n][c]));
             }
         }
     }
@@ -335,7 +336,7 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         {
             for (size_t c = 0; c < s.channels(); ++c)
             {
-                CHECK(s[n][c] == approx(signal[n][c]));
+                CHECK(math::near(s[n][c], signal[n][c]));
             }
         }
     }
@@ -359,7 +360,7 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         {
             for (size_t c = 0; c < s.channels(); ++c)
             {
-                CHECK(s[n][c] == approx(signal[n][c]));
+                CHECK(math::near(s[n][c], signal[n][c]));
             }
         }
     }
@@ -383,7 +384,7 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         {
             for (size_t c = 0; c < s.channels(); ++c)
             {
-                CHECK(s[n][c] == approx(signal[n][c]));
+                CHECK(math::near(s[n][c], signal[n][c]));
             }
         }
     }

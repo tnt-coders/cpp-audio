@@ -1,8 +1,9 @@
-#include "approx.hpp"
 #include "config.hpp"
 
 #include <catch2/catch_template_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating.hpp>
 #include <tnt/audio/io.hpp>
+#include <tnt/math/comparison.hpp>
 
 using namespace tnt;
 
@@ -20,7 +21,7 @@ TEMPLATE_TEST_CASE("file", "[file]", double, float)
                                         + 1)
                                      / 2;
 
-                constexpr auto epsilon = static_cast<TestType>(1) / scale;
+                constexpr auto margin = static_cast<TestType>(1) / scale;
 
                 const auto file = audio::file<TestType>("data/wave_files/PCM_U8.wav");
 
@@ -38,7 +39,7 @@ TEMPLATE_TEST_CASE("file", "[file]", double, float)
                 {
                     for (size_t c = 0; c < s.channels(); ++c)
                     {
-                        CHECK(s[n][c] == approx(signal[n][c]).epsilon(epsilon));
+                        CHECK_THAT(s[n][c], Catch::Matchers::WithinAbs(signal[n][c], margin));
                     }
                 }
             }
@@ -47,7 +48,7 @@ TEMPLATE_TEST_CASE("file", "[file]", double, float)
             {
                 constexpr auto scale = static_cast<size_t>(std::numeric_limits<int16_t>::max()) + 1;
 
-                constexpr auto epsilon = static_cast<TestType>(1) / scale;
+                constexpr auto margin = static_cast<TestType>(1) / scale;
 
                 const auto file = audio::file<TestType>("data/wave_files/PCM_16.wav");
 
@@ -65,7 +66,7 @@ TEMPLATE_TEST_CASE("file", "[file]", double, float)
                 {
                     for (size_t c = 0; c < s.channels(); ++c)
                     {
-                        CHECK(s[n][c] == approx(signal[n][c]).epsilon(epsilon));
+                        CHECK_THAT(s[n][c], Catch::Matchers::WithinAbs(signal[n][c], margin));
                     }
                 }
             }
@@ -88,7 +89,7 @@ TEMPLATE_TEST_CASE("file", "[file]", double, float)
                 {
                     for (size_t c = 0; c < s.channels(); ++c)
                     {
-                        CHECK(s[n][c] == approx(signal[n][c]));
+                        CHECK(math::near(s[n][c], signal[n][c]));
                     }
                 }
             }
@@ -111,7 +112,7 @@ TEMPLATE_TEST_CASE("file", "[file]", double, float)
                 {
                     for (size_t c = 0; c < s.channels(); ++c)
                     {
-                        CHECK(s[n][c] == approx(signal[n][c]));
+                        CHECK(math::near(s[n][c], signal[n][c]));
                     }
                 }
             }
@@ -134,7 +135,7 @@ TEMPLATE_TEST_CASE("file", "[file]", double, float)
                 {
                     for (size_t c = 0; c < s.channels(); ++c)
                     {
-                        CHECK(s[n][c] == approx(signal[n][c]));
+                        CHECK(math::near(s[n][c], signal[n][c]));
                     }
                 }
             }
@@ -157,7 +158,7 @@ TEMPLATE_TEST_CASE("file", "[file]", double, float)
                 {
                     for (size_t c = 0; c < s.channels(); ++c)
                     {
-                        CHECK(s[n][c] == approx(signal[n][c]));
+                        CHECK(math::near(s[n][c], signal[n][c]));
                     }
                 }
             }
@@ -182,7 +183,7 @@ TEMPLATE_TEST_CASE("file", "[file]", double, float)
             {
                 for (size_t c = 0; c < s.channels(); ++c)
                 {
-                    CHECK(s[n][c] == approx(signal[n][c]));
+                    CHECK(math::near(s[n][c], signal[n][c]));
                 }
             }
         }

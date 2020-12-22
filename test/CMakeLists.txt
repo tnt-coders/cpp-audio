@@ -5,7 +5,6 @@ file(COPY data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(${PROJECT_NAME}_test
     main.cpp
-    approx.cpp
     config.cpp
     file.cpp
     io.cpp
@@ -17,6 +16,7 @@ add_executable(${PROJECT_NAME}_test
 target_link_libraries(${PROJECT_NAME}_test
     tnt::${PROJECT_NAME}
     tnt::dsp
+    tnt::math
     Catch2::Catch2WithMain
 )
 
