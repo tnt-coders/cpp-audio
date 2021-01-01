@@ -84,7 +84,7 @@ public:
     virtual ~WaveFile() override = default;
 
     /*!
-    \copydoc file::duration()
+    \copydoc File::duration()
     */
     virtual double duration() override
     {
@@ -94,7 +94,7 @@ public:
     }
 
     /*!
-    \copydoc file::sample_rate()
+    \copydoc File::sample_rate()
     */
     virtual size_t sample_rate() override
     {
@@ -104,7 +104,7 @@ public:
     }
 
     /*!
-    \copydoc file::size()
+    \copydoc File::size()
     */
     virtual size_t size() override
     {
@@ -114,7 +114,7 @@ public:
     }
 
     /*!
-    \copydoc file::channels()
+    \copydoc File::channels()
     */
     virtual size_t channels() override
     {
@@ -124,7 +124,7 @@ public:
     }
 
     /*!
-    \copydoc file::read()
+    \copydoc File::read()
     */
     virtual Multisignal<T> read() override
     {
@@ -231,7 +231,7 @@ public:
     }
 
     /*!
-    \copydoc file::write(const Multisignal<T>& signal)
+    \copydoc File::write(const Multisignal<T>& signal)
     */
     virtual void write(const Multisignal<T>& signal) override
     {
