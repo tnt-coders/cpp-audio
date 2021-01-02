@@ -33,5 +33,9 @@ class CppAudio(ConanFile):
 
     def _configure_cmake(self):
         cmake = CMake(self)
+
+        # Prevent parallel tests (tests use shared file system resources)
+        cmake.parallel = False
+
         cmake.configure()
         return cmake
