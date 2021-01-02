@@ -129,7 +129,10 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
 
     SECTION("PCM_24")
     {
-        // No need to use "margin" anymore because 24 bit data is more accurate
+        // Use 16-bit margin because 24-bit built-in type doesn't exist
+        constexpr auto scale  = static_cast<size_t>(std::numeric_limits<int16_t>::max()) + 1;
+        constexpr auto margin = static_cast<TestType>(1) / scale;
+
         audio::WaveFile<TestType> w("data/wave_files/PCM_24.wav");
 
         CHECK(w.duration() == signal.duration());
@@ -146,7 +149,7 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
         {
             for (size_t c = 0; c < s.channels(); ++c)
             {
-                CHECK(math::near(s[n][c], signal[n][c]));
+                CHECK_THAT(s[n][c], Catch::Matchers::WithinAbs(signal[n][c], margin));
             }
         }
     }
@@ -239,8 +242,7 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
 
     SECTION("PCM_U8")
     {
-        constexpr auto scale = (static_cast<size_t>(std::numeric_limits<uint8_t>::max()) + 1) / 2;
-
+        constexpr auto scale  = (static_cast<size_t>(std::numeric_limits<uint8_t>::max()) + 1) / 2;
         constexpr auto margin = static_cast<TestType>(1) / scale;
 
         audio::WaveFile<TestType> w("data/wave_files/tmp.wav");
@@ -267,8 +269,7 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
 
     SECTION("PCM_16")
     {
-        constexpr auto scale = static_cast<size_t>(std::numeric_limits<int16_t>::max()) + 1;
-
+        constexpr auto scale  = static_cast<size_t>(std::numeric_limits<int16_t>::max()) + 1;
         constexpr auto margin = static_cast<TestType>(1) / scale;
 
         audio::WaveFile<TestType> w("data/wave_files/tmp.wav");
@@ -295,6 +296,10 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
 
     SECTION("PCM_24")
     {
+        // Use 16-bit margin because 24-bit built-in type doesn't exist
+        constexpr auto scale  = static_cast<size_t>(std::numeric_limits<int16_t>::max()) + 1;
+        constexpr auto margin = static_cast<TestType>(1) / scale;
+
         audio::WaveFile<TestType> w("data/wave_files/tmp.wav");
         w.write(signal, audio::WaveFormat::PCM, audio::WaveDataType::INT24);
 
@@ -312,7 +317,7 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         {
             for (size_t c = 0; c < s.channels(); ++c)
             {
-                CHECK(math::near(s[n][c], signal[n][c]));
+                CHECK_THAT(s[n][c], Catch::Matchers::WithinAbs(signal[n][c], margin));
             }
         }
     }
