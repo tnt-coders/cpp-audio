@@ -75,8 +75,7 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
 
     SECTION("PCM_U8")
     {
-        constexpr auto scale = (static_cast<size_t>(std::numeric_limits<uint8_t>::max()) + 1) / 2;
-
+        constexpr auto scale  = (static_cast<size_t>(std::numeric_limits<uint8_t>::max()) + 1) / 2;
         constexpr auto margin = static_cast<TestType>(1) / scale;
 
         audio::WaveFile<TestType> w("data/wave_files/PCM_U8.wav");
@@ -102,8 +101,7 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
 
     SECTION("PCM_16")
     {
-        constexpr auto scale = static_cast<size_t>(std::numeric_limits<int16_t>::max() + 1);
-
+        constexpr auto scale  = static_cast<size_t>(std::numeric_limits<int16_t>::max() + 1);
         constexpr auto margin = static_cast<TestType>(1) / scale;
 
         audio::WaveFile<TestType> w("data/wave_files/PCM_16.wav");
