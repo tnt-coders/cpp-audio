@@ -2,12 +2,13 @@ from conans import ConanFile, CMake, tools
 
 class CppAudio(ConanFile):
     author = "TNT Coders <tnt-coders@googlegroups.com>"
-    build_requires = ["catch2/3.0.0-1@tnt-coders/stable",
+    build_requires = ["boost/1.75.0",
+                      "catch2/3.0.0-1@tnt-coders/stable",
                       "math/1.0.0@tnt-coders/stable"]
-    default_options = {"shared": False}
+    default_options = {"boost:header_only": True, "shared": False}
     description = "C++ library for reading and writing audio files"
     exports_sources = "CMakeLists.txt", "docs/*", "include/*", "src/*", "test/*"
-    generators = "cmake", "cmake_paths"
+    generators = "cmake", "cmake_paths", "cmake_find_package"
     license = "GNU Lesser General Public License v3.0"
     name = "audio"
     options = {"shared": [True, False]}
@@ -33,9 +34,5 @@ class CppAudio(ConanFile):
 
     def _configure_cmake(self):
         cmake = CMake(self)
-
-        # Prevent parallel tests (tests use shared file system resources)
-        cmake.parallel = False
-
         cmake.configure()
         return cmake

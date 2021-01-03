@@ -1,5 +1,6 @@
 #include "config.hpp"
 
+#include <boost/type_index.hpp>
 #include <catch2/catch_template_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
@@ -234,12 +235,16 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
 {
     const auto signal = signal_from_config<TestType>("data/wave_files/signal.dat");
 
+    // Need to use a different file name for each type so tests can run in parallel without conflict
+    const auto test_type = boost::typeindex::type_id<TestType>().pretty_name();
+    const auto file      = "data/wave_files/tmp-" + test_type + ".wav";
+
     SECTION("PCM_U8")
     {
         constexpr auto scale  = (static_cast<size_t>(std::numeric_limits<uint8_t>::max()) + 1) / 2;
         constexpr auto margin = static_cast<TestType>(1) / scale;
 
-        audio::WaveFile<TestType> w("data/wave_files/tmp.wav");
+        audio::WaveFile<TestType> w(file);
         w.write(signal, audio::WaveFormat::PCM, audio::WaveDataType::UINT8);
 
         CHECK(w.duration() == signal.duration());
@@ -248,6 +253,8 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         CHECK(w.channels() == signal.channels());
 
         const auto s = w.read();
+
+        std::filesystem::remove(file);
 
         REQUIRE(s.size() == signal.size());
         REQUIRE(s.channels() == signal.channels());
@@ -266,7 +273,7 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         constexpr auto scale  = static_cast<size_t>(std::numeric_limits<int16_t>::max()) + 1;
         constexpr auto margin = static_cast<TestType>(1) / scale;
 
-        audio::WaveFile<TestType> w("data/wave_files/tmp.wav");
+        audio::WaveFile<TestType> w(file);
         w.write(signal, audio::WaveFormat::PCM, audio::WaveDataType::INT16);
 
         CHECK(w.duration() == signal.duration());
@@ -275,6 +282,8 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         CHECK(w.channels() == signal.channels());
 
         const auto s = w.read();
+
+        std::filesystem::remove(file);
 
         REQUIRE(s.size() == signal.size());
         REQUIRE(s.channels() == signal.channels());
@@ -290,7 +299,7 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
 
     SECTION("PCM_24")
     {
-        audio::WaveFile<TestType> w("data/wave_files/tmp.wav");
+        audio::WaveFile<TestType> w(file);
         w.write(signal, audio::WaveFormat::PCM, audio::WaveDataType::INT24);
 
         CHECK(w.duration() == signal.duration());
@@ -299,6 +308,8 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         CHECK(w.channels() == signal.channels());
 
         const auto s = w.read();
+
+        std::filesystem::remove(file);
 
         REQUIRE(s.size() == signal.size());
         REQUIRE(s.channels() == signal.channels());
@@ -314,7 +325,7 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
 
     SECTION("PCM_32")
     {
-        audio::WaveFile<TestType> w("data/wave_files/tmp.wav");
+        audio::WaveFile<TestType> w(file);
         w.write(signal, audio::WaveFormat::PCM, audio::WaveDataType::INT32);
 
         CHECK(w.duration() == signal.duration());
@@ -323,6 +334,8 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         CHECK(w.channels() == signal.channels());
 
         const auto s = w.read();
+
+        std::filesystem::remove(file);
 
         REQUIRE(s.size() == signal.size());
         REQUIRE(s.channels() == signal.channels());
@@ -338,7 +351,7 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
 
     SECTION("FLOAT")
     {
-        audio::WaveFile<TestType> w("data/wave_files/tmp.wav");
+        audio::WaveFile<TestType> w(file);
         w.write(signal, audio::WaveFormat::IEEE_FLOAT, audio::WaveDataType::FLOAT);
 
         CHECK(w.duration() == signal.duration());
@@ -347,6 +360,8 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         CHECK(w.channels() == signal.channels());
 
         const auto s = w.read();
+
+        std::filesystem::remove(file);
 
         REQUIRE(s.size() == signal.size());
         REQUIRE(s.channels() == signal.channels());
@@ -362,7 +377,7 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
 
     SECTION("DOUBLE")
     {
-        audio::WaveFile<TestType> w("data/wave_files/tmp.wav");
+        audio::WaveFile<TestType> w(file);
         w.write(signal, audio::WaveFormat::IEEE_FLOAT, audio::WaveDataType::DOUBLE);
 
         CHECK(w.duration() == signal.duration());
@@ -371,6 +386,8 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         CHECK(w.channels() == signal.channels());
 
         const auto s = w.read();
+
+        std::filesystem::remove(file);
 
         REQUIRE(s.size() == signal.size());
         REQUIRE(s.channels() == signal.channels());
