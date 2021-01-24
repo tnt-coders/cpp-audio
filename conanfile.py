@@ -33,7 +33,7 @@ class CppAudio(ConanFile):
 
     exports_sources = ("CMakeLists.txt", "docs/*", "include/*", "src/*", "test/*")
 
-    generators = ("cmake", "cmake_paths", "cmake_find_package")
+    generators = ("cmake", "cmake_find_package", "cmake_paths")
 
     def _configure_cmake(self):
         cmake = CMake(self)
