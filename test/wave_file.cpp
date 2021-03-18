@@ -15,54 +15,54 @@
 
 using namespace tnt;
 
-TEMPLATE_TEST_CASE("WaveFile construction", "[file][WaveFile][constructor]", float, double)
+TEMPLATE_TEST_CASE("wave_file construction", "[file][wave_file][constructor]", float, double)
 {
-    SECTION("PCM_U8")
+    SECTION("pcm_uint8")
     {
-        REQUIRE_NOTHROW(audio::WaveFile<TestType>("data/wave_files/PCM_U8.wav"));
+        REQUIRE_NOTHROW(audio::wave_file<TestType>("data/wave_files/pcm_uint8.wav"));
     }
 
-    SECTION("PCM_16")
+    SECTION("pcm_int16")
     {
-        REQUIRE_NOTHROW(audio::WaveFile<TestType>("data/wave_files/PCM_16.wav"));
+        REQUIRE_NOTHROW(audio::wave_file<TestType>("data/wave_files/pcm_int16.wav"));
     }
 
-    SECTION("PCM_24")
+    SECTION("pcm_int24")
     {
-        REQUIRE_NOTHROW(audio::WaveFile<TestType>("data/wave_files/PCM_24.wav"));
+        REQUIRE_NOTHROW(audio::wave_file<TestType>("data/wave_files/pcm_int24.wav"));
     }
 
-    SECTION("PCM_32")
+    SECTION("pcm_int32")
     {
-        REQUIRE_NOTHROW(audio::WaveFile<TestType>("data/wave_files/PCM_32.wav"));
+        REQUIRE_NOTHROW(audio::wave_file<TestType>("data/wave_files/pcm_int32.wav"));
     }
 
-    SECTION("FLOAT")
+    SECTION("ieee_float32")
     {
-        REQUIRE_NOTHROW(audio::WaveFile<TestType>("data/wave_files/FLOAT.wav"));
+        REQUIRE_NOTHROW(audio::wave_file<TestType>("data/wave_files/ieee_float32.wav"));
     }
 
-    SECTION("DOUBLE")
+    SECTION("ieee_float64")
     {
-        REQUIRE_NOTHROW(audio::WaveFile<TestType>("data/wave_files/DOUBLE.wav"));
+        REQUIRE_NOTHROW(audio::wave_file<TestType>("data/wave_files/ieee_float64.wav"));
     }
 
-    SECTION("File is empty")
+    SECTION("file is empty")
     {
-        REQUIRE_NOTHROW(audio::WaveFile<TestType>("data/wave_files/empty.wav"));
+        REQUIRE_NOTHROW(audio::wave_file<TestType>("data/wave_files/empty.wav"));
     }
 
-    SECTION("File doesn't exist")
+    SECTION("file doesn't exist")
     {
-        REQUIRE_NOTHROW(audio::WaveFile<TestType>("data/wave_files/nonexistent.wav"));
+        REQUIRE_NOTHROW(audio::wave_file<TestType>("data/wave_files/nonexistent.wav"));
     }
 }
 
-TEMPLATE_TEST_CASE("WaveFile accessors", "[file][WaveFile][accessors]", float, double)
+TEMPLATE_TEST_CASE("wave_file accessors", "[file][wave_file][accessors]", float, double)
 {
     const auto signal = signal_from_config<TestType>("data/wave_files/signal.dat");
 
-    audio::WaveFile<TestType> w("data/wave_files/DOUBLE.wav");
+    audio::wave_file<TestType> w("data/wave_files/ieee_float64.wav");
 
     CHECK(w.duration() == signal.duration());
     CHECK(w.sample_rate() == signal.sample_rate());
@@ -70,16 +70,16 @@ TEMPLATE_TEST_CASE("WaveFile accessors", "[file][WaveFile][accessors]", float, d
     CHECK(w.channels() == signal.channels());
 }
 
-TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
+TEMPLATE_TEST_CASE("wave_file::read", "[file][wave_file][read]", float, double)
 {
     const auto signal = signal_from_config<TestType>("data/wave_files/signal.dat");
 
-    SECTION("PCM_U8")
+    SECTION("pcm_uint8")
     {
         constexpr auto scale  = (static_cast<size_t>(std::numeric_limits<uint8_t>::max()) + 1) / 2;
         constexpr auto margin = static_cast<TestType>(1) / scale;
 
-        audio::WaveFile<TestType> w("data/wave_files/PCM_U8.wav");
+        audio::wave_file<TestType> w("data/wave_files/pcm_uint8.wav");
 
         CHECK(w.duration() == signal.duration());
         CHECK(w.sample_rate() == signal.sample_rate());
@@ -100,12 +100,12 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
         }
     }
 
-    SECTION("PCM_16")
+    SECTION("pcm_int16")
     {
         constexpr auto scale  = static_cast<size_t>(std::numeric_limits<int16_t>::max() + 1);
         constexpr auto margin = static_cast<TestType>(1) / scale;
 
-        audio::WaveFile<TestType> w("data/wave_files/PCM_16.wav");
+        audio::wave_file<TestType> w("data/wave_files/pcm_int16.wav");
 
         CHECK(w.duration() == signal.duration());
         CHECK(w.sample_rate() == signal.sample_rate());
@@ -126,9 +126,9 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
         }
     }
 
-    SECTION("PCM_24")
+    SECTION("pcm_int24")
     {
-        audio::WaveFile<TestType> w("data/wave_files/PCM_24.wav");
+        audio::wave_file<TestType> w("data/wave_files/pcm_int24.wav");
 
         CHECK(w.duration() == signal.duration());
         CHECK(w.sample_rate() == signal.sample_rate());
@@ -149,9 +149,9 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
         }
     }
 
-    SECTION("PCM_32")
+    SECTION("pcm_int32")
     {
-        audio::WaveFile<TestType> w("data/wave_files/PCM_32.wav");
+        audio::wave_file<TestType> w("data/wave_files/pcm_int32.wav");
 
         CHECK(w.duration() == signal.duration());
         CHECK(w.sample_rate() == signal.sample_rate());
@@ -172,9 +172,9 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
         }
     }
 
-    SECTION("FLOAT")
+    SECTION("ieee_float32")
     {
-        audio::WaveFile<TestType> w("data/wave_files/FLOAT.wav");
+        audio::wave_file<TestType> w("data/wave_files/ieee_float32.wav");
 
         CHECK(w.duration() == signal.duration());
         CHECK(w.sample_rate() == signal.sample_rate());
@@ -195,9 +195,9 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
         }
     }
 
-    SECTION("DOUBLE")
+    SECTION("ieee_float64")
     {
-        audio::WaveFile<TestType> w("data/wave_files/DOUBLE.wav");
+        audio::wave_file<TestType> w("data/wave_files/ieee_float64.wav");
 
         CHECK(w.duration() == signal.duration());
         CHECK(w.sample_rate() == signal.sample_rate());
@@ -220,18 +220,18 @@ TEMPLATE_TEST_CASE("WaveFile::read", "[file][WaveFile][read]", float, double)
 
     // TODO: more formats
 
-    SECTION("File doesn't exist")
+    SECTION("file doesn't exist")
     {
-        audio::WaveFile<TestType> w("data/wave_files/nonexistent.wav");
+        audio::wave_file<TestType> w("data/wave_files/nonexistent.wav");
 
         REQUIRE_THROWS_WITH(
             w.read(),
             Catch::Matchers::Equals(
-                "Failed to open WaveFile 'data/wave_files/nonexistent.wav' for reading"));
+                "Failed to open wave_file 'data/wave_files/nonexistent.wav' for reading"));
     }
 }
 
-TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
+TEMPLATE_TEST_CASE("wave_file::write", "[file][wave_file][write]", float, double)
 {
     const auto signal = signal_from_config<TestType>("data/wave_files/signal.dat");
 
@@ -239,13 +239,13 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
     const auto test_type = boost::typeindex::type_id<TestType>().pretty_name();
     const auto file      = "data/wave_files/tmp-" + test_type + ".wav";
 
-    SECTION("PCM_U8")
+    SECTION("pcm_uint8")
     {
         constexpr auto scale  = (static_cast<size_t>(std::numeric_limits<uint8_t>::max()) + 1) / 2;
         constexpr auto margin = static_cast<TestType>(1) / scale;
 
-        audio::WaveFile<TestType> w(file);
-        w.write(signal, audio::WaveFormat::PCM, audio::WaveDataType::UINT8);
+        audio::wave_file<TestType> w(file);
+        w.write(signal, audio::wave_format::pcm, audio::wave_subformat::pcm_uint8);
 
         CHECK(w.duration() == signal.duration());
         CHECK(w.sample_rate() == signal.sample_rate());
@@ -268,13 +268,13 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         }
     }
 
-    SECTION("PCM_16")
+    SECTION("pcm_int16")
     {
         constexpr auto scale  = static_cast<size_t>(std::numeric_limits<int16_t>::max()) + 1;
         constexpr auto margin = static_cast<TestType>(1) / scale;
 
-        audio::WaveFile<TestType> w(file);
-        w.write(signal, audio::WaveFormat::PCM, audio::WaveDataType::INT16);
+        audio::wave_file<TestType> w(file);
+        w.write(signal, audio::wave_format::pcm, audio::wave_subformat::pcm_int16);
 
         CHECK(w.duration() == signal.duration());
         CHECK(w.sample_rate() == signal.sample_rate());
@@ -297,10 +297,10 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         }
     }
 
-    SECTION("PCM_24")
+    SECTION("pcm_int24")
     {
-        audio::WaveFile<TestType> w(file);
-        w.write(signal, audio::WaveFormat::PCM, audio::WaveDataType::INT24);
+        audio::wave_file<TestType> w(file);
+        w.write(signal, audio::wave_format::pcm, audio::wave_subformat::pcm_int24);
 
         CHECK(w.duration() == signal.duration());
         CHECK(w.sample_rate() == signal.sample_rate());
@@ -323,10 +323,10 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         }
     }
 
-    SECTION("PCM_32")
+    SECTION("pcm_int32")
     {
-        audio::WaveFile<TestType> w(file);
-        w.write(signal, audio::WaveFormat::PCM, audio::WaveDataType::INT32);
+        audio::wave_file<TestType> w(file);
+        w.write(signal, audio::wave_format::pcm, audio::wave_subformat::pcm_int32);
 
         CHECK(w.duration() == signal.duration());
         CHECK(w.sample_rate() == signal.sample_rate());
@@ -349,10 +349,10 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         }
     }
 
-    SECTION("FLOAT")
+    SECTION("ieee_float32")
     {
-        audio::WaveFile<TestType> w(file);
-        w.write(signal, audio::WaveFormat::IEEE_FLOAT, audio::WaveDataType::FLOAT);
+        audio::wave_file<TestType> w(file);
+        w.write(signal, audio::wave_format::ieee_float, audio::wave_subformat::ieee_float32);
 
         CHECK(w.duration() == signal.duration());
         CHECK(w.sample_rate() == signal.sample_rate());
@@ -375,10 +375,10 @@ TEMPLATE_TEST_CASE("WaveFile::write", "[file][WaveFile][write]", float, double)
         }
     }
 
-    SECTION("DOUBLE")
+    SECTION("ieee_float64")
     {
-        audio::WaveFile<TestType> w(file);
-        w.write(signal, audio::WaveFormat::IEEE_FLOAT, audio::WaveDataType::DOUBLE);
+        audio::wave_file<TestType> w(file);
+        w.write(signal, audio::wave_format::ieee_float, audio::wave_subformat::ieee_float64);
 
         CHECK(w.duration() == signal.duration());
         CHECK(w.sample_rate() == signal.sample_rate());

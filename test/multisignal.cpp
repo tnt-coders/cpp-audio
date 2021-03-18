@@ -3,9 +3,9 @@
 
 using namespace tnt;
 
-TEMPLATE_TEST_CASE("Multisignal conversion", "[Multisignal][conversion]", double, float)
+TEMPLATE_TEST_CASE("multisignal conversion", "[multisignal][conversion]", double, float)
 {
-    audio::Multisignal<TestType> x(1000);
+    audio::multisignal<TestType> x(1000);
 
     // Check that audio::multisignals can be passed to functions that take dsp::multisignals
     CHECK(multisignal_conversion(x));

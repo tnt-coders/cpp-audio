@@ -7,7 +7,7 @@ add_executable(${PROJECT_NAME}_test
     main.cpp
     config.cpp
     file.cpp
-    io.cpp
+    file_base.cpp
     multisignal.cpp
     signal.cpp
     wave_file.cpp
