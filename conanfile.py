@@ -22,7 +22,7 @@ class CppAudio(ConanFile):
     }
 
     requires = (
-        "dsp/1.0.0@tnt-coders/testing",
+        "dsp/2.0.0@tnt-coders/stable",
     )
 
     build_requires = (

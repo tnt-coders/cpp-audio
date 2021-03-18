@@ -13,7 +13,7 @@ TEMPLATE_TEST_CASE("signal conversion", "[signal][conversion]", double, float)
 }
 
 template <typename T>
-bool signal_conversion(const dsp::Signal<T>& signal)
+bool signal_conversion(const dsp::signal<T>& signal)
 {
     return true;
 }

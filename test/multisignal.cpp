@@ -12,7 +12,7 @@ TEMPLATE_TEST_CASE("multisignal conversion", "[multisignal][conversion]", double
 }
 
 template <typename T>
-bool multisignal_conversion(const dsp::Multisignal<T>& signal)
+bool multisignal_conversion(const dsp::multisignal<T>& signal)
 {
     return true;
 }
