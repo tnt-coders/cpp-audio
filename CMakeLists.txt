@@ -41,5 +41,6 @@ tnt_project_Install(${PROJECT_NAME})
 
 # Create a conan package from the project
 tnt_project_Package(${PROJECT_NAME}
+  REMOTE tnt-coders
   USER tnt-coders
 )
