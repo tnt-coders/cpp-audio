@@ -40,7 +40,7 @@ add_subdirectory(test)
 tnt_project_Install(${PROJECT_NAME})
 
 # Create a conan package from the project
-tnt_project_Package(${PROJECT_NAME}
+tnt_project_ConanPackage(${PROJECT_NAME}
   REMOTE tnt-coders
   USER tnt-coders
 )
