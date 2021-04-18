@@ -14,10 +14,10 @@ tnt::audio::multisignal<T> signal_from_config(const std::filesystem::path& path)
 {
     const auto config      = read_config(path);
     const auto type        = config.at("type");
-    const auto sample_rate = std::stoull(config.at("sample_rate"));
+    const auto sample_rate = static_cast<size_t>(std::stoull(config.at("sample_rate")));
     const auto frequency   = static_cast<T>(std::stod(config.at("frequency")));
-    const auto channels    = std::stoull(config.at("channels"));
-    const auto size        = std::stoull(config.at("size"));
+    const auto channels    = static_cast<size_t>(std::stoull(config.at("channels")));
+    const auto size        = static_cast<size_t>(std::stoull(config.at("size")));
     const auto g           = tnt::dsp::signal_generator<T>(sample_rate, size);
 
     tnt::audio::multisignal<T> signal(sample_rate, size);

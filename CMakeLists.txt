@@ -7,7 +7,7 @@ project(audio LANGUAGES CXX)
 include(FetchContent)
 FetchContent_Declare(cmake-modules
   GIT_REPOSITORY https://github.com/tnt-coders/cmake-modules.git
-  GIT_TAG master
+  GIT_TAG v2.0.0
 )
 FetchContent_MakeAvailable(cmake-modules)
 
